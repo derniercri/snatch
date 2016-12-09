@@ -4,5 +4,6 @@ version = "0.1.0"
 authors = ["Antonin Carette <antonin@derniercri.io", "Jean-Serge Monbailly <jean-serge@derniercri.io>"]
 
 [dependencies]
+argparse = "0.2.1"
 hyper = "0.9"
 libsnatch = { git = "ssh://github.com/derniercri/libsnatch.git" }

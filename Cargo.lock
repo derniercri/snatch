@@ -2,9 +2,15 @@
 name = "snatch"
 version = "0.1.0"
 dependencies = [
+ "argparse 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.9.13 (registry+https://github.com/rust-lang/crates.io-index)",
  "libsnatch 0.1.0 (git+ssh://github.com/derniercri/libsnatch.git)",
 ]
+
+[[package]]
+name = "argparse"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "bitflags"
@@ -116,7 +122,7 @@ dependencies = [
 [[package]]
 name = "libsnatch"
 version = "0.1.0"
-source = "git+ssh://github.com/derniercri/libsnatch.git#36bb8833b35c4d3b837211c68b4eeb9607a0f6d8"
+source = "git+ssh://github.com/derniercri/libsnatch.git#d00ad158c3026f759bfcbfb7796fc85074945830"
 dependencies = [
  "hyper 0.9.13 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -316,6 +322,7 @@ version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [metadata]
+"checksum argparse 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "37bb99f5e39ee8b23b6e227f5b8f024207e8616f44aa4b8c76ecd828011667ef"
 "checksum bitflags 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "aad18937a628ec6abcd26d1489012cc0e18c21798210f491af69ded9b881106d"
 "checksum cookie 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)" = "0e3d6405328b6edb412158b3b7710e2634e23f3614b9bb1c412df7952489a626"
 "checksum gcc 0.3.39 (registry+https://github.com/rust-lang/crates.io-index)" = "771e4a97ff6f237cf0f7d5f5102f6e28bb9743814b6198d684da5c58b76c11e0"
