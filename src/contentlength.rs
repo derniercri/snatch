@@ -1,8 +1,7 @@
 use hyper::header::{ContentLength, Headers};
 use std::ops::Deref;
 
-/// Represents a byte, in `u64`.
-type Byte = u64;
+use Byte;
 
 /// Trait to extend functionalities of the Headers type, from `hyper`
 pub trait GetContentLength {
