@@ -2,7 +2,32 @@
 name = "snatch"
 version = "0.1.0"
 authors = ["Antonin Carette <antonin@derniercri.io", "Jean-Serge Monbailly <jean-serge@derniercri.io>"]
+description = "A simple, fast and interruptable download accelerator"
 
 [dependencies]
 argparse = "0.2.1"
 hyper = "0.9"
+
+[profile.dev]
+opt-level = 0
+debug = true
+rpath = false
+lto = false
+debug-assertions = true
+panic = 'unwind'
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = false
+debug-assertions = false
+panic = 'unwind'
+
+[profile.test]
+opt-level = 0
+debug = true
+rpath = false
+lto = false
+debug-assertions = true
+panic = 'unwind'
