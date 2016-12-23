@@ -4,25 +4,25 @@ extern crate snatch;
 #[cfg(test)]
 mod test_http_versions {
     use hyper::version::HttpVersion;
-    use snatch::http_version::is_valid_http_version;
+    use snatch::http_version::ValidateHttpVersion;
 
     #[test]
-    fn test_version_09() {
-        assert!(!is_valid_http_version(HttpVersion::Http09))
+    fn version_09_failed() {
+        assert!(!HttpVersion::Http09.greater_than_http_11())
     }
 
     #[test]
-    fn test_version_10() {
-        assert!(!is_valid_http_version(HttpVersion::Http10))
+    fn version_10_failed() {
+        assert!(!HttpVersion::Http10.greater_than_http_11())
     }
 
     #[test]
-    fn test_version_11() {
-        assert!(is_valid_http_version(HttpVersion::Http11))
+    fn version_11_succeeds() {
+        assert!(HttpVersion::Http11.greater_than_http_11())
     }
 
     #[test]
-    fn test_version_20() {
-        assert!(is_valid_http_version(HttpVersion::Http20))
+    fn version_20_succeeds() {
+        assert!(HttpVersion::Http20.greater_than_http_11())
     }
 }

@@ -1,23 +1,17 @@
 use hyper::version::HttpVersion;
 
-/// Check the given HttpVersion.
-///
-/// This version should be at least 1.1 to allow chunks downloading.
-///
-/// # Examples
-///
-/// ```
-/// extern crate hyper;
-/// extern crate snatch;
-///
-/// fn main() {
-///     use hyper::version::HttpVersion;
-///     use snatch::http_version::is_valid_http_version;
-///
-///     is_valid_http_version(HttpVersion::Http11);
-/// }
-/// ```
-///
-pub fn is_valid_http_version(v: HttpVersion) -> bool {
-    v >= HttpVersion::Http11
+pub trait ValidateHttpVersion {
+    /// Check the HttpVersion is at least 1.1 to enable chunks download.
+    ///
+    fn greater_than_http_11(&self) -> bool;
+}
+
+impl ValidateHttpVersion for HttpVersion {
+    /// Check the given HttpVersion.
+    ///
+    /// This version should be at least 1.1 to allow chunks downloading.
+    ///
+    fn greater_than_http_11(&self) -> bool {
+        self >= &HttpVersion::Http11
+    }
 }
