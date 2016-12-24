@@ -29,10 +29,9 @@ optional arguments:
 ## Build issues
 
 * `fatal error: 'openssl/hmac.h' file not found`  
-If you are in macOS, please to verify your OpenSSL configuration:  
-  ```
-  brew install openssl
-  export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
-  export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
-  export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
-  ```
+If you are on macOS, please to install `openssl` and check your OpenSSL configuration:  
+
+      brew install openssl
+      export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
+      export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
+      export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
