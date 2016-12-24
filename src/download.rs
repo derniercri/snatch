@@ -29,6 +29,7 @@ fn get_chunk_length(chunk_index: Byte,
 
 }
 
+#[cfg(test)]
 mod test_chunk_length {
     use super::get_chunk_length;
     use super::RangeBytes;
@@ -46,6 +47,26 @@ mod test_chunk_length {
     #[test]
     fn wrong_length_parameters_should_return_none() {
         assert_eq!(None, get_chunk_length(0, 0, 0));
+    }
+
+    #[test]
+    fn get_the_first_range_in_chunk() {
+        assert_eq!(Some(RangeBytes(0, 249)), get_chunk_length(0, 1000, 250));
+    }
+
+    #[test]
+    fn get_the_last_range_in_chunk() {
+        assert_eq!(Some(RangeBytes(750, 999)), get_chunk_length(3, 1000, 250));
+    }
+
+    #[test]
+    fn get_the_last_range_in_shorten_chunk() {
+        assert_eq!(Some(RangeBytes(750, 997)), get_chunk_length(3, 998, 250));
+    }
+
+    #[test]
+    fn wrong_index_parameter_should_return_none() {
+        assert_eq!(None, get_chunk_length(4, 1000, 250));
     }
 
 }
