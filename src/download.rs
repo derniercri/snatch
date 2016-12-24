@@ -12,14 +12,17 @@ fn get_chunk_length(chunk_index: Byte,
                     global_chunk_length: Byte)
                     -> Option<RangeBytes> {
 
-    // In case of wrong values, do not returns a structure
     if content_length == 0 || global_chunk_length == 0 {
         return None;
     }
 
     let b_range: Byte = chunk_index * global_chunk_length;
 
-    let e_range: Byte = min(content_length,
+    if b_range >= (content_length - 1) {
+        return None;
+    }
+
+    let e_range: Byte = min(content_length - 1,
                             ((chunk_index + 1) * global_chunk_length) - 1);
 
     Some(RangeBytes(b_range, e_range))
