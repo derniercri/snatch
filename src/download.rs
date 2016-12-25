@@ -7,7 +7,7 @@ use Byte;
 struct RangeBytes(Byte, Byte);
 
 /// Function to get the current chunk length, based on the chunk index.
-fn get_chunk_length(chunk_index: Byte,
+fn get_chunk_length(chunk_index: u64,
                     content_length: Byte,
                     global_chunk_length: Byte)
                     -> Option<RangeBytes> {
