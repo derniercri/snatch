@@ -123,6 +123,7 @@ pub fn download_chunks(content_length: u64,
 
 #[cfg(test)]
 mod test_chunk_length {
+
     use super::get_chunk_length;
     use super::RangeBytes;
 
@@ -159,6 +160,26 @@ mod test_chunk_length {
     #[test]
     fn wrong_index_parameter_should_return_none() {
         assert_eq!(None, get_chunk_length(4, 1000, 250));
+    }
+
+}
+
+#[cfg(test)]
+mod test_header {
+
+    use super::get_header_from_index;
+    use hyper::header::{ByteRangeSpec, Headers, Range};
+
+    #[test]
+    fn wrong_chunk_length_should_return_none() {
+        assert_eq!(None, get_header_from_index(0, 0, 0));
+    }
+
+    #[test]
+    fn good_chunk_length_should_return_a_good_header() {
+        let mut test_header = Headers::new();
+        test_header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(750, 997)]));
+        assert_eq!(Some((test_header, 247)), get_header_from_index(3, 998, 250));
     }
 
 }
