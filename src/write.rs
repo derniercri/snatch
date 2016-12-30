@@ -1,7 +1,6 @@
-use {SChunks};
-use std::io::Error;
+use SChunks;
 use std::fs::File;
-use std::io::Write;
+use std::io::{Error, Write};
 
 /// This function takes as parameter a file name and a vector of chaunks.
 /// The function will create a file, and append to the buffer each chunk.
