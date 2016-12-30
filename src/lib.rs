@@ -6,6 +6,7 @@ pub mod client;
 mod contentlength;
 pub mod download;
 pub mod http_version;
+pub mod write;
 
 /// Represents a number of bytes, in `u64`.
 type Byte = u64;
