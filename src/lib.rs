@@ -15,4 +15,4 @@ type Chunk = Vec<u8>;
 /// Represents a list of chunks
 type Chunks = Vec<Chunk>;
 /// Represents a shared mutable reference of chunks
-type SChunks = Arc<Mutex<Chunks>>;
+pub type SChunks = Arc<Mutex<Chunks>>;
