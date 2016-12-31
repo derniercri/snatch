@@ -5,7 +5,7 @@ A simple, fast and interruptable download accelerator, written in Rust
 
 * Simple: a command line to manage easily your downloads,
 * Fast: written in a new exciting programing language,
-* Interruptable: you can interrupt and resume easily your downloads.
+* Interruptable: you can interrupt and resume easily your downloads (SOON).
 
 ## Usage
 
