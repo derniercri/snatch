@@ -8,6 +8,7 @@ use hyper::method::Method;
 pub trait GetResponse {
     /// Given a specific URL, get the response from the target server
     fn get_http_response(&self, url: &str) -> Result<Response, Error>;
+    
     /// Given a specific URL and an header, get the response from the target server
     fn get_http_response_using_headers(&self,
                                        url: &str,
@@ -19,6 +20,7 @@ impl GetResponse for Client {
     fn get_http_response(&self, url: &str) -> Result<Response, Error> {
         self.request(Method::Get, url).send()
     }
+
     fn get_http_response_using_headers(&self,
                                        url: &str,
                                        custom_header: Headers)
