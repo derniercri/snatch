@@ -2,7 +2,7 @@ extern crate hyper;
 
 use std::sync::{Arc, Mutex};
 
-mod contentlength;
+pub mod contentlength;
 pub mod http_version;
 pub mod write;
 
