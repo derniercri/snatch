@@ -13,6 +13,7 @@ name = "snatch"
 path = "src/main.rs"
 
 [dependencies]
+ansi_term = "0.9.0"
 argparse = "0.2.1"
 hyper = "0.9"
 
