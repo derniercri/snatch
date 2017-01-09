@@ -3,9 +3,17 @@ A simple, fast and interruptable download accelerator, written in Rust
 
 ## Features
 
-* Simple: a command line to manage easily your downloads,
-* Fast: written in a new exciting programing language,
-* Interruptable: you can interrupt and resume easily your downloads (SOON).
+* **Simple**: a command line to manage easily your downloads ;
+* **Fast**: written in a new exciting programing language ;
+* **Interruptable**: you can interrupt and resume easily your downloads (_**SOON**_).
+
+## Installation
+
+1. Please to install Rust and Cargo using [rustup](https://www.rustup.rs/), and choose the _Nightly_ version ;
+2. Download _Snatch_: `git clone https://github.com/derniercri/snatch` ;
+3. Move in the project: `cd snatch` ;
+4. Install _Snatch_ using `Cargo`: `cargo install` ;
+5. Enjoy !
 
 ## Usage
 
