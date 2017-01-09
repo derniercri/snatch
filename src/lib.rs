@@ -1,4 +1,5 @@
 extern crate hyper;
+extern crate pbr;
 
 use std::sync::{Arc, Mutex};
 

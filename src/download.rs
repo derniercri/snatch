@@ -3,8 +3,9 @@ use client::GetResponse;
 use hyper::client::Client;
 use hyper::error::Error;
 use hyper::header::{ByteRangeSpec, Headers, Range};
+use pbr::{MultiBar, Pipe, ProgressBar};
 use std::cmp::min;
-use std::io::Read;
+use std::io::{Read};
 use std::thread;
 
 /// Represents a range between two Byte types
@@ -56,15 +57,23 @@ fn get_header_from_index(chunk_index: u64,
 fn download_a_chunk(http_client: &Client,
                     http_header: Headers,
                     chunk_vector: &mut Chunk,
-                    url: &str)
+                    url: &str,
+                    mpb: &mut ProgressBar<Pipe>)
                     -> Result<Byte, Error> {
 
     match http_client.get_http_response_using_headers(url, http_header) {
         Ok(mut body) => {
-            match body.read_to_end(chunk_vector) {
-                Ok(nb_bytes) => Ok(nb_bytes as u64),
-                Err(_) => Ok(0u64),
+            let mut bytes_buffer = [0; 1024];
+            let mut sum_bytes = 0;
+            while let Ok(n) = body.read(&mut bytes_buffer) {
+                if n == 0 {
+                    return Ok(sum_bytes);
+                }
+                chunk_vector.extend_from_slice(&bytes_buffer[..n]);
+                sum_bytes += n as u64;
+                mpb.add(n as u64);
             }
+            return Ok(0u64);
         }
         Err(http_error) => Err(http_error),
     }
@@ -87,6 +96,9 @@ pub fn download_chunks(content_length: u64,
     let global_chunk_length: u64 = (content_length / nb_chunks) + 1;
     let mut jobs = vec![];
 
+    let mut mpb = MultiBar::new();
+    mpb.println(&format!("Downloading {} chunks: ", nb_chunks));
+
     for chunk_index in 0..nb_chunks {
 
         let (http_header, chunk_length) =
@@ -96,12 +108,17 @@ pub fn download_chunks(content_length: u64,
         let url_clone = String::from(url);
         let clone_chunks = downloaded_chunks.clone();
 
+        let mut mp = mpb.create_bar(chunk_length);
+        mp.message(&format!("Chunk {} - ", chunk_index));
+
         jobs.push(thread::spawn(move || {
-            match download_a_chunk(&hyper_client, http_header, &mut chunk_content, &url_clone) {
+
+            match download_a_chunk(&hyper_client, http_header, &mut chunk_content, &url_clone, &mut mp) {
                 Ok(bytes_written) => {
                     if bytes_written > 0 {
                         let mut shared_clone_chunks = clone_chunks.lock().unwrap();
                         shared_clone_chunks.insert(chunk_index as usize, chunk_content);
+                        mp.finish();
                     } else {
                         panic!("The downloaded chunk {} is empty", chunk_index);
                     }
@@ -114,6 +131,8 @@ pub fn download_chunks(content_length: u64,
             }
         }));
     }
+
+    mpb.listen();
 
     for child in jobs{
         let _ = child.join();
