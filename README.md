@@ -23,6 +23,10 @@ optional arguments:
   -v,--verbose          Verbose mode
 ```
 
+## Screenshot
+
+![example](./img/snatch.png)
+
 ## Build issues
 
 * `fatal error: 'openssl/hmac.h' file not found`  
