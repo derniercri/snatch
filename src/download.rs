@@ -115,9 +115,7 @@ pub fn download_chunks(content_length: u64,
         }));
     }
 
-    for child in jobs {
-        let _ = child.join();
-    }
+    jobs.into_iter().map(|child| { child.join() });
 
 }
 
