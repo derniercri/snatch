@@ -50,7 +50,7 @@ fn main() {
     // Get the first response from the server
     let client_response = hyper_client.get_http_response(&url).unwrap();
     
-    print!("# Waiting a response from the remote content server... ");
+    print!("# Waiting a response from the remote server... ");
     
     if ! client_response.version.greater_than_http_11() {
         println!("{}", Red.bold().paint("[ERROR] The version of HTTP requests must be >= HTTP1.1 !"));
@@ -90,8 +90,6 @@ fn main() {
     }
 
     let mut shared_chunks = Arc::new(Mutex::new(core_chunks));
-
-    println!("# Downloading chunk (using {} threads)... ", threads);
 
     download_chunks(remote_content_length, &mut shared_chunks, threads as u64, &url);
 
