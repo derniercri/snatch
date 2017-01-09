@@ -17,8 +17,9 @@ pub trait GetResponse {
 }
 
 impl GetResponse for Client {
+
     fn get_http_response(&self, url: &str) -> Result<Response, Error> {
-        self.request(Method::Get, url).send()
+        self.get_http_response_using_headers(url, Headers::new())
     }
 
     fn get_http_response_using_headers(&self,
