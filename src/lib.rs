@@ -6,7 +6,6 @@ pub mod client;
 mod contentlength;
 pub mod download;
 pub mod http_version;
-pub mod write;
 
 /// Represents a number of bytes, in `u64`.
 type Byte = u64;
@@ -15,4 +14,4 @@ type Chunk = Vec<u8>;
 /// Represents a list of chunks
 type Chunks = Vec<Chunk>;
 /// Represents a shared mutable reference of chunks
-pub type SChunks = Arc<Mutex<Chunks>>;
+type SChunks = Arc<Mutex<Chunks>>;
