@@ -91,11 +91,9 @@ fn main() {
 
     let mut shared_chunks = Arc::new(Mutex::new(core_chunks));
 
-    print!("# Downloading chunk (using {} threads)... ", threads);
+    println!("# Downloading chunk (using {} threads)... ", threads);
 
     download_chunks(remote_content_length, &mut shared_chunks, threads as u64, &url);
-
-    println!("{}", Green.bold().paint("OK !"));
 
     let mut local_file = File::create(local_path).expect("[ERROR] Canno't create a file !");
 
