@@ -124,7 +124,7 @@ pub fn download_chunks(content_length: u64,
                     }
                 }
                 Err(error) => {
-                    panic!("Canno't download the chunk {}, due to error {}",
+                    panic!("Can not download the chunk {}, due to error {}",
                            chunk_index,
                            error);
                 }
