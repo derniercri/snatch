@@ -35,6 +35,14 @@ optional arguments:
 
 ![example](./img/snatch.png)
 
+## File examples
+
+* [a simple PDF file](http://www.cbu.edu.zm/downloads/pdf-sample.pdf) ;
+* [Big Bukk Bunny](http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_stereo_abl.mp4), a big free mp4 file ;
+* [the cat DNA](http://hgdownload.cse.ucsc.edu/goldenPath/felCat8/bigZips/felCat8.fa.gz), a big .gz file ;
+* [a big PDF file from Princeton](http://scholar.princeton.edu/sites/default/files/oversize_pdf_test_0.pdf).
+
+
 ## Build issues
 
 * `fatal error: 'openssl/hmac.h' file not found`  
