@@ -76,10 +76,15 @@ fn main() {
                 exit(0);
             }  
         }
-
     }
 
-    let remote_content_length = client_response.headers.get_content_length().unwrap();
+    let remote_content_length = match client_response.headers.get_content_length(){
+        Some(remote_content_length) => remote_content_length,
+        None => {
+            println!("{}", Red.bold().paint("[ERROR] Canno't get the content length of the remote content, from the server."));
+            exit(1);
+        }
+    };
 
     println!("# Remote content length: {:?} bytes", remote_content_length);
 
