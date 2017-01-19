@@ -3,7 +3,7 @@ extern crate argparse;
 extern crate hyper;
 extern crate libsnatch;
 
-use ansi_term::Colour::{Green, Red};
+use ansi_term::Colour::{Green, Yellow, Red};
 use argparse::{ArgumentParser, Store, StoreTrue};
 use hyper::client::Client;
 use libsnatch::Chunks;
@@ -49,12 +49,14 @@ fn main() {
 
     // Get the first response from the server
     let client_response = hyper_client.get_http_response(&url).unwrap();
-    
+
     print!("# Waiting a response from the remote server... ");
-    
-    if ! client_response.version.greater_than_http_11() {
-        println!("{}", Red.bold().paint("[ERROR] The version of HTTP requests must be >= HTTP1.1 !"));
-        exit(0);
+
+    if !client_response.version.greater_than_http_11() {
+        println!("{}",
+                 Yellow.bold()
+                     .paint("[WARNING] The version of HTTP requests is <= HTTP1.0 - it can be \
+                             difficult to split efficiently the remote content!"));
     } else {
         println!("{}", Green.bold().paint("OK !"));
     }
