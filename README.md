@@ -7,6 +7,8 @@ A simple, fast and interruptable download accelerator, written in Rust
 * **Fast**: written in a new exciting programing language ;
 * **Interruptable**: you can interrupt and resume easily your downloads (_**SOON**_).
 
+**NOTE**: Currently, the program runs on content that lenght is known **before** the download (by the `content-length` header from the server response) - also, the _Interruptable_ feature is not implemented yet.
+
 ## Installation
 
 1. Please to install Rust and Cargo using [rustup](https://www.rustup.rs/), and choose the _Nightly_ version ;
