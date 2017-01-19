@@ -5,7 +5,7 @@ use hyper::error::Error;
 use hyper::header::{ByteRangeSpec, Headers, Range};
 use pbr::{MultiBar, Pipe, ProgressBar};
 use std::cmp::min;
-use std::io::{Read};
+use std::io::Read;
 use std::thread;
 
 /// Represents a range between two Byte types
@@ -63,7 +63,7 @@ fn download_a_chunk(http_client: &Client,
 
     match http_client.get_http_response_using_headers(url, http_header) {
         Ok(mut body) => {
-            let mut bytes_buffer = [0; 1024];
+            let mut bytes_buffer = [0; 2048];
             let mut sum_bytes = 0;
             while let Ok(n) = body.read(&mut bytes_buffer) {
                 if n == 0 {
@@ -113,7 +113,11 @@ pub fn download_chunks(content_length: u64,
 
         jobs.push(thread::spawn(move || {
 
-            match download_a_chunk(&hyper_client, http_header, &mut chunk_content, &url_clone, &mut mp) {
+            match download_a_chunk(&hyper_client,
+                                   http_header,
+                                   &mut chunk_content,
+                                   &url_clone,
+                                   &mut mp) {
                 Ok(bytes_written) => {
                     if bytes_written > 0 {
                         let mut shared_clone_chunks = clone_chunks.lock().unwrap();
@@ -134,7 +138,7 @@ pub fn download_chunks(content_length: u64,
 
     mpb.listen();
 
-    for child in jobs{
+    for child in jobs {
         let _ = child.join();
     }
 
