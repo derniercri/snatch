@@ -19,29 +19,30 @@ use std::path::Path;
 use std::process::exit;
 
 fn main() {
-    
+
     let mut file = String::from("");
-    let mut threads : usize = 4;
+    let mut threads: usize = 4;
     let mut url = String::from("");
     let mut verbose = false;
-    
+
     {
         let mut argparse = ArgumentParser::new();
-        argparse.set_description("Snatch, a simple, fast and interruptable download accelerator, written in Rust.");
+        argparse.set_description("Snatch, a simple, fast and interruptable download accelerator, \
+                                  written in Rust.");
         argparse.refer(&mut file)
-                .add_option(&["-f", "--file"], Store,
-                "The local file to save the remote content file")
-                .required();
+            .add_option(&["-f", "--file"],
+                        Store,
+                        "The local file to save the remote content file")
+            .required();
         argparse.refer(&mut threads)
-                .add_option(&["-t", "--threads"], Store,
-                "Number of threads available to download");
+            .add_option(&["-t", "--threads"],
+                        Store,
+                        "Number of threads available to download");
         argparse.refer(&mut url)
-                .add_option(&["-u", "--url"], Store,
-                "Remote content URL to download")
-                .required();
+            .add_option(&["-u", "--url"], Store, "Remote content URL to download")
+            .required();
         argparse.refer(&mut verbose)
-                .add_option(&["-v", "--verbose"], StoreTrue,
-                "Verbose mode");
+            .add_option(&["-v", "--verbose"], StoreTrue, "Verbose mode");
         argparse.parse_args_or_exit();
     }
 
@@ -65,25 +66,34 @@ fn main() {
 
     if local_path.exists() {
         if local_path.is_dir() {
-            panic!(Red.bold().paint("[ERROR] The local path to store the remote content is already exists, and is a directory!"));
+            panic!(Red.bold()
+                .paint("[ERROR] The local path to store the remote content is already exists, \
+                        and is a directory!"));
         }
-        println!("{}", Red.bold().paint("[WARNING] The path to store the file already exists! Do you want to override it? [y/N]"));
+        println!("{}",
+                 Red.bold()
+                     .paint("[WARNING] The path to store the file already exists! Do you want \
+                             to override it? [y/N]"));
         {
             let mut user_input = String::new();
-            io::stdin().read_line(&mut user_input)
+            io::stdin()
+                .read_line(&mut user_input)
                 .ok()
                 .expect("[ERROR] Couldn't read line!");
             user_input = String::from(user_input.trim());
-            if ! (user_input == "y" || user_input == "Y") {
+            if !(user_input == "y" || user_input == "Y") {
                 exit(0);
-            }  
+            }
         }
     }
 
-    let remote_content_length = match client_response.headers.get_content_length(){
+    let remote_content_length = match client_response.headers.get_content_length() {
         Some(remote_content_length) => remote_content_length,
         None => {
-            println!("{}", Red.bold().paint("[ERROR] Canno't get the content length of the remote content, from the server."));
+            println!("{}",
+                     Red.bold()
+                         .paint("[ERROR] Canno't get the content length of the remote content, \
+                                 from the server."));
             exit(1);
         }
     };
@@ -98,7 +108,10 @@ fn main() {
 
     let mut shared_chunks = Arc::new(Mutex::new(core_chunks));
 
-    download_chunks(remote_content_length, &mut shared_chunks, threads as u64, &url);
+    download_chunks(remote_content_length,
+                    &mut shared_chunks,
+                    threads as u64,
+                    &url);
 
     let mut local_file = File::create(local_path).expect("[ERROR] Canno't create a file !");
 
