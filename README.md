@@ -1,6 +1,8 @@
 # snatch
 A simple, fast and interruptable download accelerator, written in Rust
 
+![Snatch logo](./img/snatch-carre.png)
+
 ## Features
 
 * **Simple**: a command line to manage easily your downloads ;
@@ -32,8 +34,8 @@ optional arguments:
 ```
 
 ## Screenshot
-
-![example](./img/snatch.png)
+ 
+![example](./img/snatch-screenshot.png)
 
 ## File examples
 
