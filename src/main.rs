@@ -56,8 +56,7 @@ fn main() {
     if !client_response.version.greater_than_http_11() {
         println!("{}",
                  Yellow.bold()
-                     .paint("[WARNING] The version of HTTP requests is <= HTTP1.0 - it can be \
-                             difficult to split efficiently the remote content!"));
+                     .paint("OK (HTTP version <= 1.0 detected)"));
     } else {
         println!("{}", Green.bold().paint("OK !"));
     }
