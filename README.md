@@ -1,6 +1,8 @@
 # snatch
 A simple, fast and interruptable download accelerator, written in Rust
 
+![Snatch logo](./img/snatch-horizontal.png)
+
 ## Features
 
 * **Simple**: a command line to manage easily your downloads ;
@@ -12,10 +14,8 @@ A simple, fast and interruptable download accelerator, written in Rust
 ## Installation
 
 1. Please to install Rust and Cargo using [rustup](https://www.rustup.rs/), and choose the _Nightly_ version ;
-2. Download _Snatch_: `git clone https://github.com/derniercri/snatch` ;
-3. Move in the project: `cd snatch` ;
-4. Install _Snatch_ using `Cargo`: `cargo install` ;
-5. Enjoy !
+2. Install _Snatch_: `cargo install --git https://github.com/derniercri/snatch.git` ;
+3. Enjoy !
 
 ## Usage
 
@@ -34,8 +34,8 @@ optional arguments:
 ```
 
 ## Screenshot
-
-![example](./img/snatch.png)
+ 
+![example](./img/snatch-screenshot.png)
 
 ## File examples
 
@@ -50,7 +50,9 @@ optional arguments:
 * `fatal error: 'openssl/hmac.h' file not found`  
 If you are on macOS, please to install `openssl` and check your OpenSSL configuration:  
 
-      brew install openssl
-      export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
-      export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
-      export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
+```
+brew install openssl
+export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
+export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
+export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
+```
