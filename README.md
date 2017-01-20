@@ -1,7 +1,7 @@
 # snatch
 A simple, fast and interruptable download accelerator, written in Rust
 
-![Snatch logo](./img/snatch-carre.png)
+![Snatch logo](./img/snatch-horizontal.png)
 
 ## Features
 
