@@ -1,21 +1,23 @@
 # snatch
 A simple, fast and interruptable download accelerator, written in Rust
 
+![Snatch logo](./img/snatch-horizontal.png)
+
+(A special thanks to @frankirito for this awesome logo !)
+
 ## Features
 
 * **Simple**: a command line to manage easily your downloads ;
 * **Fast**: written in a new exciting programing language ;
 * **Interruptable**: you can interrupt and resume easily your downloads (_**SOON**_).
 
-**NOTE**: Currently, the program runs on content that lenght is known **before** the download (by the `content-length` header from the server response) - also, the _Interruptable_ feature is not implemented yet.
+**NOTE**: _Snatch_ is on _alpha_ version. This version runs well on remote contents that lenght is known **before** the download (by the `content-length` header from the server response) - also, the _Interruptable_ feature is not implemented yet.
 
 ## Installation
 
-1. Please to install Rust and Cargo using [rustup](https://www.rustup.rs/), and choose the _Nightly_ version ;
-2. Download _Snatch_: `git clone https://github.com/derniercri/snatch` ;
-3. Move in the project: `cd snatch` ;
-4. Install _Snatch_ using `Cargo`: `cargo install` ;
-5. Enjoy !
+1. Please to install Rust and Cargo using [rustup](https://www.rustup.rs/) ;
+2. Install _Snatch_: `cargo install --git https://github.com/derniercri/snatch.git` ;
+3. Enjoy !
 
 ## Usage
 
@@ -34,8 +36,8 @@ optional arguments:
 ```
 
 ## Screenshot
-
-![example](./img/snatch.png)
+ 
+![example](./img/snatch-screenshot.png)
 
 ## File examples
 
@@ -50,7 +52,9 @@ optional arguments:
 * `fatal error: 'openssl/hmac.h' file not found`  
 If you are on macOS, please to install `openssl` and check your OpenSSL configuration:  
 
-      brew install openssl
-      export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
-      export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
-      export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
+```
+brew install openssl
+export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
+export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
+export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
+```

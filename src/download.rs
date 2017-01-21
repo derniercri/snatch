@@ -1,35 +1,36 @@
-use {Byte, Chunk, SChunks};
+use {Bytes, Chunk, SChunks};
 use client::GetResponse;
 use hyper::client::Client;
 use hyper::error::Error;
 use hyper::header::{ByteRangeSpec, Headers, Range};
 use pbr::{MultiBar, Pipe, ProgressBar};
+use response::CheckResponseStatus;
 use std::cmp::min;
 use std::io::Read;
 use std::thread;
 
-/// Represents a range between two Byte types
+/// Represents a range between two Bytes types
 #[derive(Debug, PartialEq)]
-struct RangeBytes(Byte, Byte);
+struct RangeBytes(Bytes, Bytes);
 
 /// Function to get the current chunk length, based on the chunk index.
 fn get_chunk_length(chunk_index: u64,
-                    content_length: Byte,
-                    global_chunk_length: Byte)
+                    content_length: Bytes,
+                    global_chunk_length: Bytes)
                     -> Option<RangeBytes> {
 
     if content_length == 0 || global_chunk_length == 0 {
         return None;
     }
 
-    let b_range: Byte = chunk_index * global_chunk_length;
+    let b_range: Bytes = chunk_index * global_chunk_length;
 
     if b_range >= (content_length - 1) {
         return None;
     }
 
-    let e_range: Byte = min(content_length - 1,
-                            ((chunk_index + 1) * global_chunk_length) - 1);
+    let e_range: Bytes = min(content_length - 1,
+                             ((chunk_index + 1) * global_chunk_length) - 1);
 
     Some(RangeBytes(b_range, e_range))
 
@@ -37,9 +38,9 @@ fn get_chunk_length(chunk_index: u64,
 
 /// Function to get the HTTP header to send to the file server, for a chunk (specified by its index)
 fn get_header_from_index(chunk_index: u64,
-                         content_length: Byte,
-                         global_chunk_length: Byte)
-                         -> Option<(Headers, Byte)> {
+                         content_length: Bytes,
+                         global_chunk_length: Bytes)
+                         -> Option<(Headers, Bytes)> {
 
     match get_chunk_length(chunk_index, content_length, global_chunk_length) {
         Some(range) => {
@@ -53,31 +54,29 @@ fn get_header_from_index(chunk_index: u64,
 }
 
 /// Function to get from the server the content of a chunk.
-/// This function returns a Result type - Byte if the content of the header is accessible, an Error type otherwise.
+/// This function returns a Result type - Bytes if the content of the header is accessible, an Error type otherwise.
 fn download_a_chunk(http_client: &Client,
                     http_header: Headers,
                     chunk_vector: &mut Chunk,
                     url: &str,
                     mpb: &mut ProgressBar<Pipe>)
-                    -> Result<Byte, Error> {
+                    -> Result<Bytes, Error> {
 
-    match http_client.get_http_response_using_headers(url, http_header) {
-        Ok(mut body) => {
-            let mut bytes_buffer = [0; 2048];
-            let mut sum_bytes = 0;
-            while let Ok(n) = body.read(&mut bytes_buffer) {
-                if n == 0 {
-                    return Ok(sum_bytes);
-                }
-                chunk_vector.extend_from_slice(&bytes_buffer[..n]);
-                sum_bytes += n as u64;
-                mpb.add(n as u64);
-            }
-            return Ok(0u64);
-        }
-        Err(http_error) => Err(http_error),
+    let mut body = http_client.get_http_response_using_headers(url, http_header).unwrap();
+    if !body.check_partialcontent_status() {
+        return Err(Error::Status);
     }
-
+    let mut bytes_buffer = [0; 2048];
+    let mut sum_bytes = 0;
+    while let Ok(n) = body.read(&mut bytes_buffer) {
+        if n == 0 {
+            return Ok(sum_bytes);
+        }
+        chunk_vector.extend_from_slice(&bytes_buffer[..n]);
+        sum_bytes += n as u64;
+        mpb.add(n as u64);
+    }
+    return Ok(0u64);
 }
 
 /// Function to download each chunk of a remote content (given by its URL).
@@ -108,30 +107,35 @@ pub fn download_chunks(content_length: u64,
         let url_clone = String::from(url);
         let clone_chunks = downloaded_chunks.clone();
 
+        // Progress bar customization
         let mut mp = mpb.create_bar(chunk_length);
-        mp.message(&format!("Chunk {} - ", chunk_index));
+        mp.tick_format("▏▎▍▌▋▊▉██▉▊▋▌▍▎▏");
+        mp.format("|#--|");
+        mp.show_tick = true;
+        mp.show_speed = false;
+        mp.show_percent = true;
+        mp.show_counter = false;
+        mp.show_time_left = true;
+        mp.message(&format!("Chunk {} ", chunk_index));
 
-        jobs.push(thread::spawn(move || {
-
-            match download_a_chunk(&hyper_client,
-                                   http_header,
-                                   &mut chunk_content,
-                                   &url_clone,
-                                   &mut mp) {
-                Ok(bytes_written) => {
-                    if bytes_written > 0 {
-                        let mut shared_clone_chunks = clone_chunks.lock().unwrap();
-                        shared_clone_chunks.insert(chunk_index as usize, chunk_content);
-                        mp.finish();
-                    } else {
-                        panic!("The downloaded chunk {} is empty", chunk_index);
-                    }
+        jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
+                                                                    http_header,
+                                                                    &mut chunk_content,
+                                                                    &url_clone,
+                                                                    &mut mp) {
+            Ok(bytes_written) => {
+                if bytes_written > 0 {
+                    let mut shared_clone_chunks = clone_chunks.lock().unwrap();
+                    shared_clone_chunks.insert(chunk_index as usize, chunk_content);
+                    mp.finish();
+                } else {
+                    panic!("The downloaded chunk {} is empty", chunk_index);
                 }
-                Err(error) => {
-                    panic!("Can not download the chunk {}, due to error {}",
-                           chunk_index,
-                           error);
-                }
+            }
+            Err(error) => {
+                panic!("Canno't download the chunk {}, due to error {}",
+                       chunk_index,
+                       error);
             }
         }));
     }

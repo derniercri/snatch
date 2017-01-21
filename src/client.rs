@@ -6,9 +6,13 @@ use hyper::method::Method;
 
 /// Trait that represents some methods to send a specific request
 pub trait GetResponse {
+    /// Given a specific URL, get the header without the content body (useful to not waste time,
+    /// ressources and informations)
+    fn get_head_response(&self, url: &str) -> Result<Response, Error>;
+
     /// Given a specific URL, get the response from the target server
     fn get_http_response(&self, url: &str) -> Result<Response, Error>;
-    
+
     /// Given a specific URL and an header, get the response from the target server
     fn get_http_response_using_headers(&self,
                                        url: &str,
@@ -17,6 +21,10 @@ pub trait GetResponse {
 }
 
 impl GetResponse for Client {
+    fn get_head_response(&self, url: &str) -> Result<Response, Error> {
+        self.request(Method::Head, url).send()
+    }
+
     fn get_http_response(&self, url: &str) -> Result<Response, Error> {
         self.get_http_response_using_headers(url, Headers::new())
     }

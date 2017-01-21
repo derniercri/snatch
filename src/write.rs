@@ -16,6 +16,6 @@ pub fn write_file(local_file_buf: &mut File, chunks: &SChunks) -> Result<(), Err
         }
     }
 
-    // Return a positive result if the remote content has been saved    
+    // Return a positive result if the remote content has been saved
     Ok(())
 }

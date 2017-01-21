@@ -6,7 +6,7 @@ extern crate libsnatch;
 use ansi_term::Colour::{Green, Yellow, Red};
 use argparse::{ArgumentParser, Store, StoreTrue};
 use hyper::client::Client;
-use libsnatch::Chunks;
+use libsnatch::{Bytes, Chunks};
 use libsnatch::client::GetResponse;
 use libsnatch::contentlength::GetContentLength;
 use libsnatch::download::download_chunks;
@@ -49,15 +49,14 @@ fn main() {
     let hyper_client = Client::new();
 
     // Get the first response from the server
-    let client_response = hyper_client.get_http_response(&url).unwrap();
+    let client_response = hyper_client.get_head_response(&url).unwrap();
 
     print!("# Waiting a response from the remote server... ");
 
     if !client_response.version.greater_than_http_11() {
         println!("{}",
                  Yellow.bold()
-                     .paint("[WARNING] The version of HTTP requests is <= HTTP1.0 - it can be \
-                             difficult to split efficiently the remote content!"));
+                     .paint("OK (HTTP version <= 1.0 detected)"));
     } else {
         println!("{}", Green.bold().paint("OK !"));
     }
@@ -98,7 +97,8 @@ fn main() {
         }
     };
 
-    println!("# Remote content length: {:?} bytes", remote_content_length);
+    println!("# Remote content length: {:?} MB",
+             (remote_content_length / 1000000) as Bytes);
 
     let mut core_chunks = Chunks::with_capacity(threads);
 
