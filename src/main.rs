@@ -32,8 +32,7 @@ fn main() {
         argparse.refer(&mut file)
             .add_option(&["-f", "--file"],
                         Store,
-                        "The local file to save the remote content file")
-            .required();
+                        "The local file to save the remote content file");
         argparse.refer(&mut threads)
             .add_option(&["-t", "--threads"],
                         Store,
@@ -59,6 +58,14 @@ fn main() {
                      .paint("OK (HTTP version <= 1.0 detected)"));
     } else {
         println!("{}", Green.bold().paint("OK !"));
+    }
+
+    // If no filename has been given, infer it
+    if file == "" {
+        file = match url.split('/').last() {
+            Some(filename) => String::from(filename),
+            None => String::from("index.html"),
+        }
     }
 
     let local_path = Path::new(&file);
@@ -117,7 +124,7 @@ fn main() {
 
     match write_file(&mut local_file, &shared_chunks) {
         Ok(()) => println!("{}", Green.bold().paint("Chunks have been successfuly saved!")),
-        Err(error) => println!("[ERROR] {}", error), 
+        Err(error) => println!("[ERROR] {}", error),
     }
 
 }
