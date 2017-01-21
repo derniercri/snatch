@@ -112,10 +112,10 @@ pub fn download_chunks(content_length: u64,
         mp.tick_format("▏▎▍▌▋▊▉██▉▊▋▌▍▎▏");
         mp.format("|#--|");
         mp.show_tick = true;
-        mp.show_speed = true;
+        mp.show_speed = false;
         mp.show_percent = true;
         mp.show_counter = false;
-        mp.show_time_left = false;
+        mp.show_time_left = true;
         mp.message(&format!("Chunk {} ", chunk_index));
 
         jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
