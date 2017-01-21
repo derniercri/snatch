@@ -107,8 +107,16 @@ pub fn download_chunks(content_length: u64,
         let url_clone = String::from(url);
         let clone_chunks = downloaded_chunks.clone();
 
+        // Progress bar customization
         let mut mp = mpb.create_bar(chunk_length);
-        mp.message(&format!("Chunk {} - ", chunk_index));
+        mp.tick_format("▏▎▍▌▋▊▉██▉▊▋▌▍▎▏");
+        mp.format("|#--|");
+        mp.show_tick = true;
+        mp.show_speed = true;
+        mp.show_percent = true;
+        mp.show_counter = false;
+        mp.show_time_left = false;
+        mp.message(&format!("Chunk {} ", chunk_index));
 
         jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
                                                                     http_header,
