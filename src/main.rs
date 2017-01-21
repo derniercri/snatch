@@ -61,7 +61,7 @@ fn main() {
     }
 
     // If no filename has been given, infer it
-    if file == "" {
+    if file.is_empty() {
         file = match url.split('/').last() {
             Some(filename) => String::from(filename),
             None => String::from("index.html"),
