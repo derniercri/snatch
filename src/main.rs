@@ -6,7 +6,7 @@ extern crate libsnatch;
 use ansi_term::Colour::{Green, Yellow, Red};
 use argparse::{ArgumentParser, Store, StoreTrue};
 use hyper::client::Client;
-use libsnatch::Chunks;
+use libsnatch::{Bytes, Chunks};
 use libsnatch::client::GetResponse;
 use libsnatch::contentlength::GetContentLength;
 use libsnatch::download::download_chunks;
@@ -97,7 +97,8 @@ fn main() {
         }
     };
 
-    println!("# Remote content length: {:?} bytes", remote_content_length);
+    println!("# Remote content length: {:?} MB",
+             (remote_content_length / 1000000) as Bytes);
 
     let mut core_chunks = Chunks::with_capacity(threads);
 
