@@ -17,6 +17,7 @@ ansi_term = "0.9.0"
 argparse = "0.2.1"
 hyper = "0.9"
 pbr = "1.0.0-alpha.2"
+num_cpus = "1.0"
 
 [profile.dev]
 opt-level = 0
