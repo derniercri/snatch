@@ -11,7 +11,7 @@ pub mod response;
 pub mod write;
 
 /// Represents a number of bytes, as `u64`.
-type Bytes = u64;
+pub type Bytes = u64;
 /// Represents a 'chunk', which is just a piece of bytes.
 type Chunk = Vec<u8>;
 /// Represents a list of chunks
