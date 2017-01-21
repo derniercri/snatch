@@ -22,7 +22,7 @@ use std::process::exit;
 fn main() {
 
     let mut file = String::from("");
-    let mut threads: usize = num_cpus::get();
+    let mut threads: usize = num_cpus::get_physical();
     let mut url = String::from("");
     let mut verbose = false;
 
