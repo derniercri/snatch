@@ -2,6 +2,7 @@ extern crate ansi_term;
 extern crate argparse;
 extern crate hyper;
 extern crate libsnatch;
+extern crate num_cpus;
 
 use ansi_term::Colour::{Green, Yellow, Red};
 use argparse::{ArgumentParser, Store, StoreTrue};
@@ -21,7 +22,7 @@ use std::process::exit;
 fn main() {
 
     let mut file = String::from("");
-    let mut threads: usize = 4;
+    let mut threads: usize = num_cpus::get();
     let mut url = String::from("");
     let mut verbose = false;
 
@@ -117,7 +118,7 @@ fn main() {
 
     match write_file(&mut local_file, &shared_chunks) {
         Ok(()) => println!("{}", Green.bold().paint("Chunks have been successfuly saved!")),
-        Err(error) => println!("[ERROR] {}", error), 
+        Err(error) => println!("[ERROR] {}", error),
     }
 
 }
