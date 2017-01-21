@@ -18,6 +18,8 @@ use std::sync::{Arc, Mutex};
 use std::path::Path;
 use std::process::exit;
 
+static DEFAULT_FILENAME: &'static str = "index.html";
+
 fn main() {
 
     let mut file = String::from("");
@@ -64,7 +66,7 @@ fn main() {
     if file.is_empty() {
         file = match url.split('/').last() {
             Some(filename) => String::from(filename),
-            None => String::from("index.html"),
+            None => String::from(DEFAULT_FILENAME),
         }
     }
 
