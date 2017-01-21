@@ -10,6 +10,8 @@ use std::io::Read;
 use std::thread;
 use std::time::{Instant, Duration};
 
+const DOWNLOAD_BUFFER_BYTES: usize = 1024*64;
+
 /// Represents a range between two Bytes types
 #[derive(Debug, PartialEq)]
 struct RangeBytes(Bytes, Bytes);
@@ -67,7 +69,7 @@ fn download_a_chunk(http_client: &Client,
     if !body.check_partialcontent_status() {
         return Err(Error::Status);
     }
-    let mut bytes_buffer = [0; 2048];
+    let mut bytes_buffer = [0; DOWNLOAD_BUFFER_BYTES];
     let mut sum_bytes = 0;
 
     let progress_update_interval = Duration::from_millis(500);
