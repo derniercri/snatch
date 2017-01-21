@@ -7,6 +7,7 @@ pub mod client;
 pub mod contentlength;
 pub mod download;
 pub mod http_version;
+pub mod response;
 pub mod write;
 
 /// Represents a number of bytes, as `u64`.
