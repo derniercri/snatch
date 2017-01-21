@@ -19,6 +19,8 @@ use std::sync::{Arc, Mutex};
 use std::path::Path;
 use std::process::exit;
 
+static DEFAULT_FILENAME: &'static str = "index.html";
+
 fn main() {
 
     let mut file = String::from("");
@@ -33,8 +35,7 @@ fn main() {
         argparse.refer(&mut file)
             .add_option(&["-f", "--file"],
                         Store,
-                        "The local file to save the remote content file")
-            .required();
+                        "The local file to save the remote content file");
         argparse.refer(&mut threads)
             .add_option(&["-t", "--threads"],
                         Store,
@@ -60,6 +61,14 @@ fn main() {
                      .paint("OK (HTTP version <= 1.0 detected)"));
     } else {
         println!("{}", Green.bold().paint("OK !"));
+    }
+
+    // If no filename has been given, infer it
+    if file.is_empty() {
+        file = match url.split('/').last() {
+            Some(filename) => String::from(filename),
+            None => String::from(DEFAULT_FILENAME),
+        }
     }
 
     let local_path = Path::new(&file);
