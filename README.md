@@ -50,7 +50,7 @@ optional arguments:
 ## Build issues
 
 * `fatal error: 'openssl/hmac.h' file not found`  
-If you are on macOS, please to install `openssl` and check your OpenSSL configuration:  
+If you are on macOS, please install `openssl` and check your OpenSSL configuration:  
 
 ```
 brew install openssl
