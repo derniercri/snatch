@@ -49,7 +49,7 @@ fn main() {
     let hyper_client = Client::new();
 
     // Get the first response from the server
-    let client_response = hyper_client.get_http_response(&url).unwrap();
+    let client_response = hyper_client.get_head_response(&url).unwrap();
 
     print!("# Waiting a response from the remote server... ");
 
