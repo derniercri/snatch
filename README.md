@@ -46,15 +46,3 @@ optional arguments:
 * [the cat DNA](http://hgdownload.cse.ucsc.edu/goldenPath/felCat8/bigZips/felCat8.fa.gz), a big .gz file ;
 * [a big PDF file from Princeton](http://scholar.princeton.edu/sites/default/files/oversize_pdf_test_0.pdf).
 
-
-## Build issues
-
-* `fatal error: 'openssl/hmac.h' file not found`  
-If you are on macOS, please to install `openssl` and check your OpenSSL configuration:  
-
-```
-brew install openssl
-export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
-export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
-export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
-```
