@@ -4,6 +4,7 @@ use hyper::client::Client;
 use hyper::error::Error;
 use hyper::header::{ByteRangeSpec, Headers, Range};
 use pbr::{MultiBar, Pipe, ProgressBar};
+use response::CheckResponseStatus;
 use std::cmp::min;
 use std::io::Read;
 use std::thread;
@@ -63,6 +64,10 @@ fn download_a_chunk(http_client: &Client,
 
     match http_client.get_http_response_using_headers(url, http_header) {
         Ok(mut body) => {
+            // TODO This condition must return an error here, breaking the other threads
+            if !body.check_partialcontent_status() {
+                return Ok(0u64);
+            }
             let mut bytes_buffer = [0; 2048];
             let mut sum_bytes = 0;
             while let Ok(n) = body.read(&mut bytes_buffer) {
