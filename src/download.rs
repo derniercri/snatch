@@ -62,27 +62,21 @@ fn download_a_chunk(http_client: &Client,
                     mpb: &mut ProgressBar<Pipe>)
                     -> Result<Bytes, Error> {
 
-    match http_client.get_http_response_using_headers(url, http_header) {
-        Ok(mut body) => {
-            // TODO This condition must return an error here, breaking the other threads
-            if !body.check_partialcontent_status() {
-                return Ok(0u64);
-            }
-            let mut bytes_buffer = [0; 2048];
-            let mut sum_bytes = 0;
-            while let Ok(n) = body.read(&mut bytes_buffer) {
-                if n == 0 {
-                    return Ok(sum_bytes);
-                }
-                chunk_vector.extend_from_slice(&bytes_buffer[..n]);
-                sum_bytes += n as u64;
-                mpb.add(n as u64);
-            }
-            return Ok(0u64);
-        }
-        Err(http_error) => Err(http_error),
+    let mut body = http_client.get_http_response_using_headers(url, http_header).unwrap();
+    if !body.check_partialcontent_status() {
+        return Err(Error::Status);
     }
-
+    let mut bytes_buffer = [0; 2048];
+    let mut sum_bytes = 0;
+    while let Ok(n) = body.read(&mut bytes_buffer) {
+        if n == 0 {
+            return Ok(sum_bytes);
+        }
+        chunk_vector.extend_from_slice(&bytes_buffer[..n]);
+        sum_bytes += n as u64;
+        mpb.add(n as u64);
+    }
+    return Ok(0u64);
 }
 
 /// Function to download each chunk of a remote content (given by its URL).
