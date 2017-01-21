@@ -9,8 +9,8 @@ pub mod download;
 pub mod http_version;
 pub mod write;
 
-/// Represents a byte, in `u64`.
-type Byte = u64;
+/// Represents a number of bytes, as `u64`.
+type Bytes = u64;
 /// Represents a 'chunk', which is just a piece of bytes.
 type Chunk = Vec<u8>;
 /// Represents a list of chunks
