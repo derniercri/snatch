@@ -91,7 +91,7 @@ fn main() {
         None => {
             println!("{}",
                      Red.bold()
-                         .paint("[ERROR] Canno't get the content length of the remote content, \
+                         .paint("[ERROR] Cannot get the content length of the remote content, \
                                  from the server."));
             exit(1);
         }
@@ -113,7 +113,7 @@ fn main() {
                     threads as u64,
                     &url);
 
-    let mut local_file = File::create(local_path).expect("[ERROR] Canno't create a file !");
+    let mut local_file = File::create(local_path).expect("[ERROR] Cannot create a file !");
 
     match write_file(&mut local_file, &shared_chunks) {
         Ok(()) => println!("{}", Green.bold().paint("Chunks have been successfuly saved!")),
