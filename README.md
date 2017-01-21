@@ -11,7 +11,7 @@ A simple, fast and interruptable download accelerator, written in Rust
 * **Fast**: written in a new exciting programing language ;
 * **Interruptable**: you can interrupt and resume easily your downloads (_**SOON**_).
 
-**NOTE**: Currently, the program runs on content that lenght is known **before** the download (by the `content-length` header from the server response) - also, the _Interruptable_ feature is not implemented yet.
+**NOTE**: _Snatch_ is on _alpha_ version. This version runs well on remote contents that lenght is known **before** the download (by the `content-length` header from the server response) - also, the _Interruptable_ feature is not implemented yet.
 
 ## Installation
 
