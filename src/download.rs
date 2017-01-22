@@ -1,4 +1,5 @@
-use {Bytes, Chunk, SChunks};
+use Bytes;
+use write::{OutputFileWriter, OutputChunkWriter};
 use client::GetResponse;
 use hyper::client::Client;
 use hyper::error::Error;
@@ -44,13 +45,13 @@ fn get_chunk_length(chunk_index: u64,
 fn get_header_from_index(chunk_index: u64,
                          content_length: Bytes,
                          global_chunk_length: Bytes)
-                         -> Option<(Headers, Bytes)> {
+                         -> Option<(Headers, Bytes, Bytes)> {
 
     match get_chunk_length(chunk_index, content_length, global_chunk_length) {
         Some(range) => {
             let mut header = Headers::new();
             header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(range.0, range.1)]));
-            Some((header, range.1 - range.0))
+            Some((header, range.0, range.1 - range.0))
         }
         None => None,
     }
@@ -61,7 +62,7 @@ fn get_header_from_index(chunk_index: u64,
 /// This function returns a Result type - Bytes if the content of the header is accessible, an Error type otherwise.
 fn download_a_chunk(http_client: &Client,
                     http_header: Headers,
-                    chunk_vector: &mut Chunk,
+                    mut chunk_writer: OutputChunkWriter,
                     url: &str,
                     mpb: &mut ProgressBar<Pipe>)
                     -> Result<Bytes, Error> {
@@ -82,7 +83,8 @@ fn download_a_chunk(http_client: &Client,
             return Ok(sum_bytes);
         }
 
-        chunk_vector.extend_from_slice(&bytes_buffer[..n]);
+        chunk_writer.write(sum_bytes, &bytes_buffer[0..n]);
+
         sum_bytes += n as u64;
 
         if Instant::now().duration_since(last_progress_time) > progress_update_interval {
@@ -103,7 +105,7 @@ fn download_a_chunk(http_client: &Client,
 /// * the number of chunks that contains the remote content,
 /// * the URL of the remote content server.
 pub fn download_chunks(content_length: u64,
-                       downloaded_chunks: &SChunks,
+                       mut out_file: OutputFileWriter,
                        nb_chunks: u64,
                        url: &str) {
 
@@ -117,12 +119,10 @@ pub fn download_chunks(content_length: u64,
 
     for chunk_index in 0..nb_chunks {
 
-        let (http_header, chunk_length) =
+        let (http_header, chunk_offset, chunk_length) =
             get_header_from_index(chunk_index, content_length, global_chunk_length).unwrap();
-        let mut chunk_content = Chunk::with_capacity(chunk_length as usize);
         let hyper_client = Client::new();
         let url_clone = String::from(url);
-        let clone_chunks = downloaded_chunks.clone();
 
         // Progress bar customization
         let mut mp = mpb.create_bar(chunk_length);
@@ -136,15 +136,15 @@ pub fn download_chunks(content_length: u64,
         mp.set_units(Units::Bytes);
         mp.message(&format!("Chunk {} ", chunk_index));
 
+
+        let chunk_writer = out_file.get_chunk_writer(chunk_offset);
         jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
                                                                     http_header,
-                                                                    &mut chunk_content,
+                                                                    chunk_writer,
                                                                     &url_clone,
                                                                     &mut mp) {
             Ok(bytes_written) => {
                 if bytes_written > 0 {
-                    let mut shared_clone_chunks = clone_chunks.lock().unwrap();
-                    shared_clone_chunks.insert(chunk_index as usize, chunk_content);
                     mp.finish();
                 } else {
                     panic!("The downloaded chunk {} is empty", chunk_index);
