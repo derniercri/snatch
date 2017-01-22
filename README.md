@@ -7,8 +7,8 @@ A simple, fast and interruptable download accelerator, written in Rust
 
 ## Features
 
-* **Simple**: a command line to manage easily your downloads ;
-* **Fast**: written in a new exciting programing language ;
+* **Simple**: a command line to manage easily your downloads
+* **Fast**: written in a new exciting programing language
 * **Interruptable**: you can interrupt and resume easily your downloads (_**SOON**_).
 
 **NOTE**: _Snatch_ is on _alpha_ version. This version runs well on remote contents that length is known **before** the download (by the `content-length` header from the server response) - also, the _Interruptable_ feature is not implemented yet.
@@ -17,7 +17,7 @@ A simple, fast and interruptable download accelerator, written in Rust
 
 1. Please to install Rust and Cargo using [rustup](https://www.rustup.rs/) ;
 2. Install _Snatch_: `cargo install --git https://github.com/derniercri/snatch.git` ;
-3. Enjoy !
+3. Enjoy!
 
 ## Usage
 
@@ -42,8 +42,8 @@ optional arguments:
 ## File examples
 
 * [A simple PDF file](http://www.cbu.edu.zm/downloads/pdf-sample.pdf)
-* [Big Buck Bunny](http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_stereo_abl.mp4), a big free mp4 file
-* [The cat DNA](http://hgdownload.cse.ucsc.edu/goldenPath/felCat8/bigZips/felCat8.fa.gz), a big .gz file
+* [Big Buck Bunny](http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_stereo_abl.mp4) - a big free mp4 file
+* [The cat DNA](http://hgdownload.cse.ucsc.edu/goldenPath/felCat8/bigZips/felCat8.fa.gz) - a big .gz file
 * [A big PDF file from Princeton](http://scholar.princeton.edu/sites/default/files/oversize_pdf_test_0.pdf)
 
 
