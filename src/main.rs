@@ -87,10 +87,6 @@ fn main() {
         println!("{}", Green.bold().paint("OK !"));
     }
 
-    // If no filename has been given, infer it
-    if file.is_empty() {
-    }
-
     let local_path = Path::new(&file);
 
     if local_path.exists() {
