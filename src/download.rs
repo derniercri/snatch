@@ -87,12 +87,12 @@ fn download_a_chunk(http_client: &Client,
 
         if Instant::now().duration_since(last_progress_time) > progress_update_interval {
             last_progress_time = Instant::now();
-            let progress_bytes_delta = sum_bytes-last_progress_bytes;
+            let progress_bytes_delta = sum_bytes - last_progress_bytes;
             last_progress_bytes = sum_bytes;
             mpb.add(progress_bytes_delta);
         }
     }
-    mpb.add(sum_bytes-last_progress_bytes);
+    mpb.add(sum_bytes - last_progress_bytes);
     return Ok(0u64);
 }
 
