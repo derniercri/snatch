@@ -11,7 +11,12 @@ use std::io::Read;
 use std::thread;
 use std::time::{Instant, Duration};
 
+/// Constant to represent the length of the buffer to download
+/// the remote content
 const DOWNLOAD_BUFFER_BYTES: usize = 1024 * 64;
+
+/// Constant to represent the refresh interval (in milliseconds)
+/// for the CLI
 const PROGRESS_UPDATE_INTERVAL_MILLIS: u64 = 500;
 
 /// Represents a range between two Bytes types
@@ -87,6 +92,7 @@ fn download_a_chunk(http_client: &Client,
 
         sum_bytes += n as u64;
 
+        // Update the CLI
         if Instant::now().duration_since(last_progress_time) > progress_update_interval {
             last_progress_time = Instant::now();
             let progress_bytes_delta = sum_bytes - last_progress_bytes;
