@@ -1,21 +1,41 @@
-use SChunks;
 use std::fs::File;
-use std::io::{Error, Write};
+use std::io::Write;
+use std::io::{Seek, SeekFrom};
+use std::sync::{Arc, Mutex};
 
-/// This function fills the buffer of a given local file, with the content of chunks.
-pub fn write_file(local_file_buf: &mut File, chunks: &SChunks) -> Result<(), Error> {
+pub struct OutputFileWriter {
+    file : Arc<Mutex<File>>
+}
 
-    // Get the access to the chunks
-    let chunks_m = chunks.lock().unwrap();
+pub struct OutputChunkWriter {
+    output: OutputFileWriter,
+    offset: u64
+}
 
-    // For each ones, write it into the file buffer
-    for chunk in chunks_m.iter() {
-        match local_file_buf.write_all(chunk) {
-            Ok(_) => (),
-            Err(error) => return Err(error),
-        }
+impl Clone for OutputFileWriter {
+    fn clone(&self) -> OutputFileWriter {
+        OutputFileWriter{ file: self.file.clone() }
+    }
+}
+
+impl OutputFileWriter {
+    pub fn write(&mut self, offset: u64, buf: &[u8]) {
+        let mut out_file = self.file.lock().unwrap();
+        out_file.seek(SeekFrom::Start(offset)).expect("Error while seeking in file.");
+        out_file.write_all(buf).expect("Error while writing to file.");
     }
 
-    // Return a positive result if the remote content has been saved
-    Ok(())
+    pub fn get_chunk_writer(&mut self, offset: u64) -> OutputChunkWriter {
+        OutputChunkWriter {output: self.clone(), offset: offset}
+    }
+
+    pub fn new(file: File) -> OutputFileWriter {
+        OutputFileWriter {file: Arc::new(Mutex::new(file))}
+    }
+}
+
+impl OutputChunkWriter {
+    pub fn write(&mut self, done_offset: u64, buf: &[u8]) {
+        self.output.write(self.offset+done_offset, buf)
+    }
 }

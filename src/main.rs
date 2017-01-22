@@ -11,10 +11,9 @@ use libsnatch::client::GetResponse;
 use libsnatch::contentlength::GetContentLength;
 use libsnatch::download::download_chunks;
 use libsnatch::http_version::ValidateHttpVersion;
-use libsnatch::write::write_file;
+use libsnatch::write::OutputFileWriter;
 use std::fs::File;
 use std::io;
-use std::sync::{Arc, Mutex};
 use std::path::Path;
 use std::process::exit;
 
@@ -106,18 +105,14 @@ fn main() {
         core_chunks.push(Vec::new());
     }
 
-    let mut shared_chunks = Arc::new(Mutex::new(core_chunks));
+    let local_file = File::create(local_path).expect("[ERROR] Cannot create a file !");
+
+    local_file.set_len(remote_content_length).expect("[ERROR] Cannot extend file to download size!");
+    let out_file = OutputFileWriter::new(local_file);
 
     download_chunks(remote_content_length,
-                    &mut shared_chunks,
+                    out_file,
                     threads as u64,
                     &url);
-
-    let mut local_file = File::create(local_path).expect("[ERROR] Cannot create a file !");
-
-    match write_file(&mut local_file, &shared_chunks) {
-        Ok(()) => println!("{}", Green.bold().paint("Chunks have been successfuly saved!")),
-        Err(error) => println!("[ERROR] {}", error), 
-    }
 
 }
