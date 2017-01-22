@@ -45,13 +45,13 @@ fn get_chunk_length(chunk_index: u64,
 fn get_header_from_index(chunk_index: u64,
                          content_length: Bytes,
                          global_chunk_length: Bytes)
-                         -> Option<(Headers, Bytes, Bytes)> {
+                         -> Option<(Headers, RangeBytes)> {
 
     match get_chunk_length(chunk_index, content_length, global_chunk_length) {
         Some(range) => {
             let mut header = Headers::new();
             header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(range.0, range.1)]));
-            Some((header, range.0, range.1 - range.0))
+            Some((header, RangeBytes(range.0, range.1 - range.0)))
         }
         None => None,
     }
@@ -119,7 +119,7 @@ pub fn download_chunks(content_length: u64,
 
     for chunk_index in 0..nb_chunks {
 
-        let (http_header, chunk_offset, chunk_length) =
+        let (http_header, RangeBytes(chunk_offset, chunk_length)) =
             get_header_from_index(chunk_index, content_length, global_chunk_length).unwrap();
         let hyper_client = Client::new();
         let url_clone = String::from(url);
