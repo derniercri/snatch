@@ -11,6 +11,7 @@ use std::thread;
 use std::time::{Instant, Duration};
 
 const DOWNLOAD_BUFFER_BYTES: usize = 1024*64;
+const PROGRESS_UPDATE_INTERVAL_MILLIS : u32 = 500;
 
 /// Represents a range between two Bytes types
 #[derive(Debug, PartialEq)]
@@ -72,7 +73,7 @@ fn download_a_chunk(http_client: &Client,
     let mut bytes_buffer = [0; DOWNLOAD_BUFFER_BYTES];
     let mut sum_bytes = 0;
 
-    let progress_update_interval = Duration::from_millis(500);
+    let progress_update_interval = Duration::from_millis(PROGRESS_UPDATE_INTERVAL_MILLIS);
     let mut last_progress_bytes = 0;
     let mut last_progress_time = Instant::now() - progress_update_interval;
 
