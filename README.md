@@ -70,6 +70,7 @@ Thank you for your interest in contributing to _Snatch_ ! :-D
 ## Build issues
 
 * `fatal error: 'openssl/hmac.h' file not found`  
+If you are on a GNU/Linux distribution (like Ubuntu), please install `libssl-dev`.  
 If you are on macOS, please install `openssl` and check your OpenSSL configuration:  
 
 ```
@@ -78,5 +79,3 @@ export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
 export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
 export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
 ```
-
-If you are on a GNU/Linux distribution (like Ubuntu), please to check if `libssl-dev` has been installed.
