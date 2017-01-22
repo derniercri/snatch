@@ -3,11 +3,15 @@ use client::GetResponse;
 use hyper::client::Client;
 use hyper::error::Error;
 use hyper::header::{ByteRangeSpec, Headers, Range};
-use pbr::{MultiBar, Pipe, ProgressBar};
+use pbr::{MultiBar, Pipe, ProgressBar, Units};
 use response::CheckResponseStatus;
 use std::cmp::min;
 use std::io::Read;
 use std::thread;
+use std::time::{Instant, Duration};
+
+const DOWNLOAD_BUFFER_BYTES: usize = 1024 * 64;
+const PROGRESS_UPDATE_INTERVAL_MILLIS: u64 = 500;
 
 /// Represents a range between two Bytes types
 #[derive(Debug, PartialEq)]
@@ -66,16 +70,29 @@ fn download_a_chunk(http_client: &Client,
     if !body.check_partialcontent_status() {
         return Err(Error::Status);
     }
-    let mut bytes_buffer = [0; 2048];
+    let mut bytes_buffer = [0; DOWNLOAD_BUFFER_BYTES];
     let mut sum_bytes = 0;
+
+    let progress_update_interval = Duration::from_millis(PROGRESS_UPDATE_INTERVAL_MILLIS);
+    let mut last_progress_bytes = 0;
+    let mut last_progress_time = Instant::now() - progress_update_interval;
+
     while let Ok(n) = body.read(&mut bytes_buffer) {
         if n == 0 {
             return Ok(sum_bytes);
         }
+
         chunk_vector.extend_from_slice(&bytes_buffer[..n]);
         sum_bytes += n as u64;
-        mpb.add(n as u64);
+
+        if Instant::now().duration_since(last_progress_time) > progress_update_interval {
+            last_progress_time = Instant::now();
+            let progress_bytes_delta = sum_bytes - last_progress_bytes;
+            last_progress_bytes = sum_bytes;
+            mpb.add(progress_bytes_delta);
+        }
     }
+    mpb.add(sum_bytes - last_progress_bytes);
     return Ok(0u64);
 }
 
@@ -112,10 +129,11 @@ pub fn download_chunks(content_length: u64,
         mp.tick_format("▏▎▍▌▋▊▉██▉▊▋▌▍▎▏");
         mp.format("|#--|");
         mp.show_tick = true;
-        mp.show_speed = false;
+        mp.show_speed = true;
         mp.show_percent = true;
         mp.show_counter = false;
         mp.show_time_left = true;
+        mp.set_units(Units::Bytes);
         mp.message(&format!("Chunk {} ", chunk_index));
 
         jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
