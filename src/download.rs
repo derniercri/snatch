@@ -10,8 +10,8 @@ use std::io::Read;
 use std::thread;
 use std::time::{Instant, Duration};
 
-const DOWNLOAD_BUFFER_BYTES: usize = 1024*64;
-const PROGRESS_UPDATE_INTERVAL_MILLIS : u32 = 500;
+const DOWNLOAD_BUFFER_BYTES: usize = 1024 * 64;
+const PROGRESS_UPDATE_INTERVAL_MILLIS: u64 = 500;
 
 /// Represents a range between two Bytes types
 #[derive(Debug, PartialEq)]
