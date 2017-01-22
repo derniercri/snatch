@@ -66,7 +66,7 @@ fn main() {
 
     if argparse.is_present("debug") {
         println!("# [{}] version: {}",
-                 Yellow.bold().paint("VERSION"),
+                 Yellow.bold().paint("DEBUG_MODE"),
                  crate_version!());
         println!("# [{}] file: {}", Yellow.bold().paint("DEBUG_MODE"), file);
         println!("# [{}] threads: {}",
