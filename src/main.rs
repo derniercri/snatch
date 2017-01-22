@@ -2,6 +2,7 @@ extern crate ansi_term;
 extern crate argparse;
 extern crate hyper;
 extern crate libsnatch;
+extern crate num_cpus;
 
 use ansi_term::Colour::{Green, Yellow, Red};
 use argparse::{ArgumentParser, Store, StoreTrue};
@@ -17,10 +18,12 @@ use std::io;
 use std::path::Path;
 use std::process::exit;
 
+static DEFAULT_FILENAME: &'static str = "index.html";
+
 fn main() {
 
     let mut file = String::from("");
-    let mut threads: usize = 4;
+    let mut threads: usize = num_cpus::get_physical();
     let mut url = String::from("");
     let mut verbose = false;
 
@@ -31,8 +34,7 @@ fn main() {
         argparse.refer(&mut file)
             .add_option(&["-f", "--file"],
                         Store,
-                        "The local file to save the remote content file")
-            .required();
+                        "The local file to save the remote content file");
         argparse.refer(&mut threads)
             .add_option(&["-t", "--threads"],
                         Store,
@@ -60,6 +62,14 @@ fn main() {
         println!("{}", Green.bold().paint("OK !"));
     }
 
+    // If no filename has been given, infer it
+    if file.is_empty() {
+        file = match url.split('/').last() {
+            Some(filename) => String::from(filename),
+            None => String::from(DEFAULT_FILENAME),
+        }
+    }
+
     let local_path = Path::new(&file);
 
     if local_path.exists() {
@@ -69,7 +79,7 @@ fn main() {
                         and is a directory!"));
         }
         println!("{}",
-                 Red.bold()
+                 Yellow.bold()
                      .paint("[WARNING] The path to store the file already exists! Do you want \
                              to override it? [y/N]"));
         {
@@ -107,12 +117,14 @@ fn main() {
 
     let local_file = File::create(local_path).expect("[ERROR] Cannot create a file !");
 
-    local_file.set_len(remote_content_length).expect("[ERROR] Cannot extend file to download size!");
+    local_file.set_len(remote_content_length)
+        .expect("[ERROR] Cannot extend file to download size!");
     let out_file = OutputFileWriter::new(local_file);
 
-    download_chunks(remote_content_length,
-                    out_file,
-                    threads as u64,
-                    &url);
+    download_chunks(remote_content_length, out_file, threads as u64, &url);
+
+    println!("{} Your download is available in {}",
+             Green.bold().paint("Done!"),
+             local_path.to_str().unwrap());
 
 }
