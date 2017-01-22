@@ -21,17 +21,23 @@ A simple, fast and interruptable download accelerator, written in Rust
 ## Usage
 
 ```
-Usage:
-    snatch [OPTIONS]
-
+Snatch 0.1.2
 Snatch, a simple, fast and interruptable download accelerator, written in Rust.
 
-optional arguments:
-  -h,--help             show this help message and exit
-  -f,--file FILE        The local file to save the remote content file
-  -t,--threads THREADS  Number of threads available to download
-  -u,--url URL          Remote content URL to download
-  -v,--verbose          Verbose mode
+USAGE:
+    snatch [FLAGS] [OPTIONS] <url>
+
+FLAGS:
+    -d, --debug      Active the debug mode
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+OPTIONS:
+    -f, --file <file>          The local file to save the remote content file
+    -t, --threads <threads>    Threads which can use to download
+
+ARGS:
+    <url>
 ```
 
 ## Screenshot

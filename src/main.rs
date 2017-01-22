@@ -1,11 +1,12 @@
 extern crate ansi_term;
-extern crate argparse;
+#[macro_use]
+extern crate clap;
 extern crate hyper;
 extern crate libsnatch;
 extern crate num_cpus;
 
 use ansi_term::Colour::{Green, Yellow, Red};
-use argparse::{ArgumentParser, Store, StoreTrue};
+use clap::{App, Arg};
 use hyper::client::Client;
 use libsnatch::{Bytes, Chunks};
 use libsnatch::client::GetResponse;
@@ -22,31 +23,58 @@ static DEFAULT_FILENAME: &'static str = "index.html";
 
 fn main() {
 
-    let mut file = String::from("");
-    let mut threads: usize = num_cpus::get_physical();
-    let mut url = String::from("");
-    let mut verbose = false;
+    // Parse arguments
 
-    {
-        let mut argparse = ArgumentParser::new();
-        argparse.set_description("Snatch, a simple, fast and interruptable download accelerator, \
-                                  written in Rust.");
-        argparse.refer(&mut file)
-            .add_option(&["-f", "--file"],
-                        Store,
-                        "The local file to save the remote content file");
-        argparse.refer(&mut threads)
-            .add_option(&["-t", "--threads"],
-                        Store,
-                        "Number of threads available to download");
-        argparse.refer(&mut url)
-            .add_option(&["-u", "--url"], Store, "Remote content URL to download")
-            .required();
-        argparse.refer(&mut verbose)
-            .add_option(&["-v", "--verbose"], StoreTrue, "Verbose mode");
-        argparse.parse_args_or_exit();
+    let argparse = App::new("Snatch")
+        .about("Snatch, a simple, fast and interruptable download accelerator, written in Rust.")
+        .version(crate_version!())
+        .arg(Arg::with_name("file")
+            .long("file")
+            .short("f")
+            .takes_value(true)
+            .help("The local file to save the remote content file"))
+        .arg(Arg::with_name("threads")
+            .long("threads")
+            .short("t")
+            .takes_value(true)
+            .help("Threads which can use to download"))
+        .arg(Arg::with_name("debug")
+            .long("debug")
+            .short("d")
+            .help("Active the debug mode"))
+        .arg(Arg::with_name("url")
+            .index(1)
+            //.multiple(true)
+            .required(true))
+        .get_matches();
+
+    // Get informations from arguments
+
+    let url = argparse.value_of("url").unwrap();
+
+    let file = match argparse.value_of("file") {
+        Some(filename) => filename,
+        None => {
+            match url.split('/').last() {
+                Some(url_filename) => url_filename,
+                None => DEFAULT_FILENAME,
+            }
+        }
+    };
+
+    let threads: usize = value_t!(argparse, "threads", usize).unwrap_or(num_cpus::get_physical());
+
+    if argparse.is_present("debug") {
+        println!("# [{}] version: {}",
+                 Yellow.bold().paint("DEBUG_MODE"),
+                 crate_version!());
+        println!("# [{}] file: {}", Yellow.bold().paint("DEBUG_MODE"), file);
+        println!("# [{}] threads: {}",
+                 Yellow.bold().paint("DEBUG_MODE"),
+                 threads);
     }
 
+    // Run Snatch
     let hyper_client = Client::new();
 
     // Get the first response from the server
@@ -60,14 +88,6 @@ fn main() {
                      .paint("OK (HTTP version <= 1.0 detected)"));
     } else {
         println!("{}", Green.bold().paint("OK !"));
-    }
-
-    // If no filename has been given, infer it
-    if file.is_empty() {
-        file = match url.split('/').last() {
-            Some(filename) => String::from(filename),
-            None => String::from(DEFAULT_FILENAME),
-        }
     }
 
     let local_path = Path::new(&file);
