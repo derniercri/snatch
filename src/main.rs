@@ -65,6 +65,9 @@ fn main() {
     let threads: usize = value_t!(argparse, "threads", usize).unwrap_or(num_cpus::get_physical());
 
     if argparse.is_present("debug") {
+        println!("# [{}] version: {}",
+                 Yellow.bold().paint("VERSION"),
+                 crate_version!());
         println!("# [{}] file: {}", Yellow.bold().paint("DEBUG_MODE"), file);
         println!("# [{}] threads: {}",
                  Yellow.bold().paint("DEBUG_MODE"),
