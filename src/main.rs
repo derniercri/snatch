@@ -42,6 +42,9 @@ fn main() {
             .long("debug")
             .short("d")
             .help("Active the debug mode"))
+        .arg(Arg::with_name("force")
+            .long("force")
+            .help("Assume Yes to all queries and do not prompt"))
         .arg(Arg::with_name("url")
             .index(1)
             //.multiple(true)
@@ -98,20 +101,28 @@ fn main() {
                 .paint("[ERROR] The local path to store the remote content is already exists, \
                         and is a directory!"));
         }
-        println!("{}",
-                 Yellow.bold()
-                     .paint("[WARNING] The path to store the file already exists! Do you want \
-                             to override it? [y/N]"));
-        {
-            let mut user_input = String::new();
-            io::stdin()
-                .read_line(&mut user_input)
-                .ok()
-                .expect("[ERROR] Couldn't read line!");
-            user_input = String::from(user_input.trim());
-            if !(user_input == "y" || user_input == "Y") {
-                exit(0);
+        if !argparse.is_present("force") {
+            println!("{}",
+                     Yellow.bold()
+                         .paint("[WARNING] The path to store the file already exists! Do you want \
+                                 to override it? [y/N]"));
+            {
+                let mut user_input = String::new();
+                io::stdin()
+                    .read_line(&mut user_input)
+                    .ok()
+                    .expect("[ERROR] Couldn't read line!");
+                user_input = String::from(user_input.trim());
+                if !(user_input == "y" || user_input == "Y") {
+                    exit(0);
+                }
             }
+        }
+        else {
+            println!("{}",
+                    Yellow.bold()
+                         .paint("[WARNING] The path to store the file already exists! \
+                                 It is going to be overriden."));
         }
     }
 
