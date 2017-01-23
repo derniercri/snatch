@@ -75,7 +75,7 @@ Thank you for your interest in contributing to _Snatch_ ! :-D
 
 ## Build issues
 
-* Libraries cannot be build 
+* Libraries cannot be build  
 Please to check you are using the latest version of `rustc` (stable), running `rustup update`.
 
 * `fatal error: 'openssl/hmac.h' file not found`  
