@@ -29,6 +29,7 @@ USAGE:
 
 FLAGS:
     -d, --debug      Active the debug mode
+        --force      Assume Yes to all queries and do not prompt
     -h, --help       Prints help information
     -V, --version    Prints version information
 
