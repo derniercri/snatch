@@ -8,7 +8,7 @@ extern crate num_cpus;
 use ansi_term::Colour::{Green, Yellow, Red};
 use clap::{App, Arg};
 use hyper::client::Client;
-use libsnatch::{Bytes, Chunks};
+use libsnatch::{Bytes};
 use libsnatch::client::GetResponse;
 use libsnatch::contentlength::GetContentLength;
 use libsnatch::download::download_chunks;
@@ -128,12 +128,6 @@ fn main() {
 
     println!("# Remote content length: {:?} MB",
              (remote_content_length / 1000000) as Bytes);
-
-    let mut core_chunks = Chunks::with_capacity(threads);
-
-    for _ in 0..threads {
-        core_chunks.push(Vec::new());
-    }
 
     let local_file = File::create(local_path).expect("[ERROR] Cannot create a file !");
 
