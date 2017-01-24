@@ -22,9 +22,9 @@ static DEFAULT_FILENAME: &'static str = "index.html";
 
 fn main() {
 
-    let mut file = String::from("");
+    let mut file = String::new();
     let mut threads: usize = num_cpus::get_physical();
-    let mut url = String::from("");
+    let mut url = String::new();
     let mut verbose = false;
 
     {
