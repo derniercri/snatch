@@ -7,14 +7,14 @@ A simple, fast and interruptable download accelerator, written in Rust
 
 ## Current features
 
-* **Simple**: a command line to manage easily your downloads ;
+* **Simple**: a command line tool to manage easily your downloads ;
 * **Fast**: multithreading support.
 
-**NOTE**: _Snatch_ is on _alpha_ version. This version runs well on remote contents that length is known **before** the download (by the `content-length` header from the server response) - also, the _Interruptable_ feature is not implemented yet.
+**NOTE**: _Snatch_ is on _alpha_ version. This version runs well on remote contents with a length known **before** the download (with the `content-length` header from the server response) - also, the _Interruptable_ feature is not implemented yet.
 
 ## Installation
 
-1. Please to install Rust and Cargo using [rustup](https://www.rustup.rs/) ;
+1. Install Rust and Cargo using [rustup](https://www.rustup.rs/) ;
 2. Install _Snatch_: `cargo install --git https://github.com/derniercri/snatch.git` ;
 3. Enjoy !
 
@@ -28,14 +28,14 @@ USAGE:
     snatch [FLAGS] [OPTIONS] <url>
 
 FLAGS:
-    -d, --debug      Active the debug mode
+    -d, --debug      Activate the debug mode
         --force      Assume Yes to all queries and do not prompt
     -h, --help       Prints help information
     -V, --version    Prints version information
 
 OPTIONS:
     -f, --file <file>          The local file to save the remote content file
-    -t, --threads <threads>    Threads which can use to download
+    -t, --threads <threads>    Threads which can be used to download
 
 ARGS:
     <url>
@@ -55,7 +55,7 @@ ARGS:
 ## Contributing
 
 You want to contribute to _Snatch_ ?  
-This is a list of ways you can help us out :
+Here are a few ways you can help us out :
 
 * improve the documentation,
 * improve the CLI,
@@ -68,7 +68,7 @@ If you want to create a pull request, this is the procedure to make it great:
 * fork the project,
 * create a local branch to make changes (from our `devel` branch),
 * test your changes,
-* create a pull request (please to compare with our `devel` branch),
+* create a pull request (please compare it with our `devel` branch),
 * explain your changes,
 * submit !
 
@@ -77,7 +77,7 @@ Thank you for your interest in contributing to _Snatch_ ! :-D
 ## Build issues
 
 * Libraries cannot be build  
-Please to check you are using the latest version of `rustc` (stable), running `rustup update`.
+Please go check if you are using the latest version of `rustc` (stable), running `rustup update`.
 
 * `fatal error: 'openssl/hmac.h' file not found`  
 If you are on a GNU/Linux distribution (like Ubuntu), please install `libssl-dev`.  
