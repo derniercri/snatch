@@ -218,7 +218,7 @@ mod test_chunk_length {
 #[cfg(test)]
 mod test_header {
 
-    use super::get_header_from_index;
+    use super::{get_header_from_index, RangeBytes};
     use hyper::header::{ByteRangeSpec, Headers, Range};
 
     #[test]
@@ -230,7 +230,8 @@ mod test_header {
     fn good_chunk_length_should_return_a_good_header() {
         let mut test_header = Headers::new();
         test_header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(750, 997)]));
-        assert_eq!(Some((test_header, 247)), get_header_from_index(3, 998, 250));
+        assert_eq!(Some((test_header, RangeBytes(750, 247))),
+                   get_header_from_index(3, 998, 250));
     }
 
 }
