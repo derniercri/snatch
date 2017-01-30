@@ -15,7 +15,7 @@ A simple, fast and interruptable download accelerator, written in Rust
 ## Installation
 
 1. Install Rust and Cargo using [rustup](https://www.rustup.rs/) ;
-2. Install _Snatch_: `cargo install --git https://github.com/derniercri/snatch.git` ;
+2. Install _Snatch_: `cargo install --git https://github.com/derniercri/snatch.git --branch devel` ;
 3. Enjoy !
 
 ## Usage
@@ -42,7 +42,7 @@ ARGS:
 ```
 
 ## Screenshot
- 
+
 ![example](./img/snatch-screenshot.png)
 
 ## File examples
@@ -54,7 +54,7 @@ ARGS:
 
 ## Contributing
 
-You want to contribute to _Snatch_ ?  
+You want to contribute to _Snatch_ ?
 Here are a few ways you can help us out :
 
 * improve the documentation,
@@ -72,16 +72,16 @@ If you want to create a pull request, this is the procedure to make it great:
 * explain your changes,
 * submit !
 
-Thank you for your interest in contributing to _Snatch_ ! :-D 
+Thank you for your interest in contributing to _Snatch_ ! :-D
 
 ## Build issues
 
-* Libraries cannot be build  
+* Libraries cannot be build
 Please go check if you are using the latest version of `rustc` (stable), running `rustup update`.
 
-* `fatal error: 'openssl/hmac.h' file not found`  
-If you are on a GNU/Linux distribution (like Ubuntu), please install `libssl-dev`.  
-If you are on macOS, please install `openssl` and check your OpenSSL configuration:  
+* `fatal error: 'openssl/hmac.h' file not found`
+If you are on a GNU/Linux distribution (like Ubuntu), please install `libssl-dev`.
+If you are on macOS, please install `openssl` and check your OpenSSL configuration:
 
 ```
 brew install openssl

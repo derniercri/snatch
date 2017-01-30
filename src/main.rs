@@ -55,15 +55,9 @@ fn main() {
 
     let url = argparse.value_of("url").unwrap();
 
-    let file = match argparse.value_of("file") {
-        Some(filename) => filename,
-        None => {
-            match url.split('/').last() {
-                Some(url_filename) => url_filename,
-                None => DEFAULT_FILENAME,
-            }
-        }
-    };
+    let file = argparse.value_of("file").unwrap_or_else(
+        || url.split('/').last().unwrap_or(DEFAULT_FILENAME)
+    );
 
     let threads: usize = value_t!(argparse, "threads", usize).unwrap_or(num_cpus::get_physical());
 

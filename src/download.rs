@@ -46,22 +46,22 @@ fn get_chunk_length(chunk_index: u64,
 
 }
 
+
 /// Function to get the HTTP header to send to the file server, for a chunk (specified by its index)
 fn get_header_from_index(chunk_index: u64,
                          content_length: Bytes,
                          global_chunk_length: Bytes)
                          -> Option<(Headers, RangeBytes)> {
 
-    match get_chunk_length(chunk_index, content_length, global_chunk_length) {
-        Some(range) => {
+    get_chunk_length(chunk_index, content_length, global_chunk_length).map(
+        |range| {
             let mut header = Headers::new();
             header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(range.0, range.1)]));
-            Some((header, RangeBytes(range.0, range.1 - range.0)))
+            (header, RangeBytes(range.0, range.1 - range.0))
         }
-        None => None,
-    }
-
+    )
 }
+
 
 /// Function to get from the server the content of a chunk.
 /// This function returns a Result type - Bytes if the content of the header is accessible, an Error type otherwise.
