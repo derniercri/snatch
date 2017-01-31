@@ -1,3 +1,5 @@
+![build status](https://api.travis-ci.org/derniercri/snatch.svg?branch=devel)
+
 # snatch
 A simple, fast and interruptable download accelerator, written in Rust
 
@@ -89,5 +91,3 @@ export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
 export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
 export DEP_OPENSSL_INCLUDE=`brew --prefix openssl`/include
 ```
-
-<!-- Mon petit commentaire -->
