@@ -1,5 +1,4 @@
-Master: ![build status](https://api.travis-ci.org/derniercri/snatch.svg?branch=master)  
-Devel: ![build status](https://api.travis-ci.org/derniercri/snatch.svg?branch=devel)
+ ![build status](https://api.travis-ci.org/derniercri/snatch.svg?branch=devel)
 
 # snatch
 A simple, fast and interruptable download accelerator, written in Rust
