@@ -1,3 +1,4 @@
+use authorization::AuthorizationHeaderFactory;
 use Bytes;
 use write::{OutputFileWriter, OutputChunkWriter};
 use client::GetResponse;
@@ -53,13 +54,11 @@ fn get_header_from_index(chunk_index: u64,
                          global_chunk_length: Bytes)
                          -> Option<(Headers, RangeBytes)> {
 
-    get_chunk_length(chunk_index, content_length, global_chunk_length).map(
-        |range| {
-            let mut header = Headers::new();
-            header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(range.0, range.1)]));
-            (header, RangeBytes(range.0, range.1 - range.0))
-        }
-    )
+    get_chunk_length(chunk_index, content_length, global_chunk_length).map(|range| {
+        let mut header = Headers::new();
+        header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(range.0, range.1)]));
+        (header, RangeBytes(range.0, range.1 - range.0))
+    })
 }
 
 
@@ -113,7 +112,8 @@ fn download_a_chunk(http_client: &Client,
 pub fn download_chunks(content_length: u64,
                        mut out_file: OutputFileWriter,
                        nb_chunks: u64,
-                       url: &str) {
+                       url: &str,
+                       authorization_header_factory: Option<AuthorizationHeaderFactory>) {
 
     // let mut downloaded_chunks: Arc<Mutex<Chunks>> =
     //     Arc::new(Mutex::new(Chunks::with_capacity(nb_chunks as usize)));
@@ -125,10 +125,13 @@ pub fn download_chunks(content_length: u64,
 
     for chunk_index in 0..nb_chunks {
 
-        let (http_header, RangeBytes(chunk_offset, chunk_length)) =
+        let (mut http_header, RangeBytes(chunk_offset, chunk_length)) =
             get_header_from_index(chunk_index, content_length, global_chunk_length).unwrap();
         let hyper_client = Client::new();
         let url_clone = String::from(url);
+        if let Some(auth_header_factory) = authorization_header_factory.clone() {
+            http_header.set(auth_header_factory.build_header());
+        }
 
         // Progress bar customization
         let mut mp = mpb.create_bar(chunk_length);

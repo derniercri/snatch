@@ -5,10 +5,12 @@ extern crate hyper;
 extern crate libsnatch;
 extern crate num_cpus;
 
-use ansi_term::Colour::{Green, Yellow, Red};
+use ansi_term::Colour::{Green, Yellow, Red, White};
 use clap::{App, Arg};
 use hyper::client::Client;
-use libsnatch::{Bytes};
+use hyper::header::Headers;
+use libsnatch::authorization::{AuthorizationHeaderFactory, AuthorizationType, GetAuthorizationType};
+use libsnatch::Bytes;
 use libsnatch::client::GetResponse;
 use libsnatch::contentlength::GetContentLength;
 use libsnatch::download::download_chunks;
@@ -16,6 +18,7 @@ use libsnatch::http_version::ValidateHttpVersion;
 use libsnatch::write::OutputFileWriter;
 use std::fs::File;
 use std::io;
+use std::io::Write;
 use std::path::Path;
 use std::process::exit;
 
@@ -55,9 +58,8 @@ fn main() {
 
     let url = argparse.value_of("url").unwrap();
 
-    let file = argparse.value_of("file").unwrap_or_else(
-        || url.split('/').last().unwrap_or(DEFAULT_FILENAME)
-    );
+    let file = argparse.value_of("file")
+        .unwrap_or_else(|| url.split('/').last().unwrap_or(DEFAULT_FILENAME));
 
     let threads: usize = value_t!(argparse, "threads", usize).unwrap_or(num_cpus::get_physical());
 
@@ -87,6 +89,41 @@ fn main() {
         println!("{}", Green.bold().paint("OK !"));
     }
 
+    let auth_type = client_response.headers.get_authorization_type();
+    let auth_header_factory = match auth_type {
+        Some(a_type) => {
+            match a_type {
+                AuthorizationType::Basic => {
+                    println!("{}",
+                             Yellow.bold().paint("The remote content is protected by Basic Auth."));
+                    let username = prompt_user(White.bold(), "Username:");
+                    let password = prompt_user(White.bold(), "Password:");
+                    Some(AuthorizationHeaderFactory::new(AuthorizationType::Basic,
+                                                         username,
+                                                         Some(password)))
+                }
+                _ => {
+                    println!("{}",
+                             Red.bold()
+                                 .paint(format!("[ERROR] The remote content is protected by {} \
+                                                 Authorization, which is not supported!",
+                                                a_type)));
+                    exit(1);
+                }
+            }
+        }
+        None => None,
+    };
+
+    let client_response = match auth_header_factory.clone() {
+        Some(header_factory) => {
+            let mut headers = Headers::new();
+            headers.set(header_factory.build_header());
+            hyper_client.get_head_response_using_headers(&url, headers).unwrap()
+        }
+        None => client_response,
+    };
+
     let local_path = Path::new(&file);
 
     if local_path.exists() {
@@ -96,25 +133,16 @@ fn main() {
                         and is a directory!"));
         }
         if !argparse.is_present("force") {
+            let user_input = prompt_user(Yellow.bold(),
+                                         "[WARNING] The path to store the file already exists! \
+                                          Do you want to override it? [y/N]");
+
+            if !(user_input == "y" || user_input == "Y") {
+                exit(0);
+            }
+        } else {
             println!("{}",
                      Yellow.bold()
-                         .paint("[WARNING] The path to store the file already exists! Do you want \
-                                 to override it? [y/N]"));
-            {
-                let mut user_input = String::new();
-                io::stdin()
-                    .read_line(&mut user_input)
-                    .ok()
-                    .expect("[ERROR] Couldn't read line!");
-                user_input = String::from(user_input.trim());
-                if !(user_input == "y" || user_input == "Y") {
-                    exit(0);
-                }
-            }
-        }
-        else {
-            println!("{}",
-                    Yellow.bold()
                          .paint("[WARNING] The path to store the file already exists! \
                                  It is going to be overriden."));
         }
@@ -140,10 +168,26 @@ fn main() {
         .expect("[ERROR] Cannot extend file to download size!");
     let out_file = OutputFileWriter::new(local_file);
 
-    download_chunks(remote_content_length, out_file, threads as u64, &url);
+    download_chunks(remote_content_length,
+                    out_file,
+                    threads as u64,
+                    &url,
+                    auth_header_factory);
 
     println!("{} Your download is available in {}",
              Green.bold().paint("Done!"),
              local_path.to_str().unwrap());
 
+}
+
+fn prompt_user(style: ansi_term::Style, prompt: &str) -> String {
+    print!("{} ", style.paint(prompt));
+    io::stdout().flush().expect("[ERROR] Couldn't flush stdout!");
+
+    let mut user_input = String::new();
+    io::stdin()
+        .read_line(&mut user_input)
+        .ok()
+        .expect("[ERROR] Couldn't read line!");
+    String::from(user_input.trim())
 }
