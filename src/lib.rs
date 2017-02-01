@@ -3,6 +3,7 @@ extern crate pbr;
 
 use std::sync::{Arc, Mutex};
 
+pub mod authorization;
 pub mod client;
 pub mod contentlength;
 pub mod download;

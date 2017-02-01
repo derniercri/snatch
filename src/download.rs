@@ -1,9 +1,10 @@
+use authorization::AuthorizationHeaderFactory;
 use Bytes;
 use write::{OutputFileWriter, OutputChunkWriter};
 use client::GetResponse;
 use hyper::client::Client;
 use hyper::error::Error;
-use hyper::header::{ByteRangeSpec, Headers, Range};
+use hyper::header::{ByteRangeSpec, Headers, Range, Scheme};
 use pbr::{MultiBar, Pipe, ProgressBar, Units};
 use response::CheckResponseStatus;
 use std::cmp::min;
@@ -113,7 +114,8 @@ fn download_a_chunk(http_client: &Client,
 pub fn download_chunks(content_length: u64,
                        mut out_file: OutputFileWriter,
                        nb_chunks: u64,
-                       url: &str) {
+                       url: &str,
+                       authorization_header_factory: Option<AuthorizationHeaderFactory>) {
 
     // let mut downloaded_chunks: Arc<Mutex<Chunks>> =
     //     Arc::new(Mutex::new(Chunks::with_capacity(nb_chunks as usize)));
@@ -125,10 +127,13 @@ pub fn download_chunks(content_length: u64,
 
     for chunk_index in 0..nb_chunks {
 
-        let (http_header, RangeBytes(chunk_offset, chunk_length)) =
+        let (mut http_header, RangeBytes(chunk_offset, chunk_length)) =
             get_header_from_index(chunk_index, content_length, global_chunk_length).unwrap();
         let hyper_client = Client::new();
         let url_clone = String::from(url);
+        if let Some(auth_header_factory) = authorization_header_factory.clone() {
+            http_header.set(auth_header_factory.build_header());
+        }
 
         // Progress bar customization
         let mut mp = mpb.create_bar(chunk_length);
