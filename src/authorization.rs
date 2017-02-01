@@ -1,7 +1,5 @@
 use hyper::header::{Authorization, Basic, Headers, Scheme};
 use std::fmt::{Display, Formatter, Result};
-use std::marker::PhantomData;
-use std::str::FromStr;
 
 /// Enum for the different types of authorization required by a remote document.
 #[derive(Clone)]

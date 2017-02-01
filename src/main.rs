@@ -8,7 +8,7 @@ extern crate num_cpus;
 use ansi_term::Colour::{Green, Yellow, Red, White};
 use clap::{App, Arg};
 use hyper::client::Client;
-use hyper::header::{Authorization, Basic, Headers};
+use hyper::header::Headers;
 use libsnatch::authorization::{AuthorizationHeaderFactory, AuthorizationType, GetAuthorizationType};
 use libsnatch::Bytes;
 use libsnatch::client::GetResponse;
@@ -58,9 +58,8 @@ fn main() {
 
     let url = argparse.value_of("url").unwrap();
 
-    let file = argparse.value_of("file").unwrap_or_else(
-        || url.split('/').last().unwrap_or(DEFAULT_FILENAME)
-    );
+    let file = argparse.value_of("file")
+        .unwrap_or_else(|| url.split('/').last().unwrap_or(DEFAULT_FILENAME));
 
     let threads: usize = value_t!(argparse, "threads", usize).unwrap_or(num_cpus::get_physical());
 

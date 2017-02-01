@@ -4,7 +4,7 @@ use write::{OutputFileWriter, OutputChunkWriter};
 use client::GetResponse;
 use hyper::client::Client;
 use hyper::error::Error;
-use hyper::header::{ByteRangeSpec, Headers, Range, Scheme};
+use hyper::header::{ByteRangeSpec, Headers, Range};
 use pbr::{MultiBar, Pipe, ProgressBar, Units};
 use response::CheckResponseStatus;
 use std::cmp::min;
@@ -54,13 +54,11 @@ fn get_header_from_index(chunk_index: u64,
                          global_chunk_length: Bytes)
                          -> Option<(Headers, RangeBytes)> {
 
-    get_chunk_length(chunk_index, content_length, global_chunk_length).map(
-        |range| {
-            let mut header = Headers::new();
-            header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(range.0, range.1)]));
-            (header, RangeBytes(range.0, range.1 - range.0))
-        }
-    )
+    get_chunk_length(chunk_index, content_length, global_chunk_length).map(|range| {
+        let mut header = Headers::new();
+        header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(range.0, range.1)]));
+        (header, RangeBytes(range.0, range.1 - range.0))
+    })
 }
 
 
