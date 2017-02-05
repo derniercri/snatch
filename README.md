@@ -45,7 +45,7 @@ ARGS:
 
 ## Screenshot
 
-![example](./img/snatch-screenshot.png)
+![example](./img/snatch_devel.gif)
 
 ## File examples
 
