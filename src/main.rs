@@ -95,7 +95,10 @@ fn main() {
             match a_type {
                 AuthorizationType::Basic => {
                     println!("{}",
-                             Yellow.bold().paint("The remote content is protected by Basic Auth."));
+                             Yellow.bold()
+                                 .paint("[WARNING] The remote content is protected by Basic \
+                                         Auth.\nPlease to enter below your credential \
+                                         informations."));
                     let username = prompt_user(White.bold(), "Username:");
                     let password = prompt_user(White.bold(), "Password:");
                     Some(AuthorizationHeaderFactory::new(AuthorizationType::Basic,
@@ -106,7 +109,10 @@ fn main() {
                     println!("{}",
                              Red.bold()
                                  .paint(format!("[ERROR] The remote content is protected by {} \
-                                                 Authorization, which is not supported!",
+                                                 Authorization, which is not supported!\nYou \
+                                                 can create a new issue to report this problem \
+                                                 in https://github.\
+                                                 com/derniercri/snatch/issues/new",
                                                 a_type)));
                     exit(1);
                 }
