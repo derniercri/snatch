@@ -168,13 +168,13 @@ fn main() {
                                  content length..."));
 
             // Trying to force the server to send to us the remote content length
-            let mut custom_HTTP_header = Headers::new();
+            let mut custom_http_header = Headers::new();
             // HTTP header to get all the remote content - if the response is OK, get the
             // ContentLength information sent back from the server
-            custom_HTTP_header.set(Range::Bytes(vec![ByteRangeSpec::AllFrom(0)]));
+            custom_http_header.set(Range::Bytes(vec![ByteRangeSpec::AllFrom(0)]));
             // Get a response from the server, using the custom HTTP request
             let client_response =
-                hyper_client.get_http_response_using_headers(&url, custom_HTTP_header).unwrap();
+                hyper_client.get_http_response_using_headers(&url, custom_http_header).unwrap();
             // Try again to get the content length - if this one is unknown again, stop the program
             match client_response.headers.get_content_length() {
                 Some(remote_content_length) => {
