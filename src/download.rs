@@ -1,6 +1,5 @@
 use authorization::AuthorizationHeaderFactory;
 use Bytes;
-use write::{OutputFileWriter, OutputChunkWriter};
 use client::GetResponse;
 use hyper::client::Client;
 use hyper::error::Error;
@@ -11,6 +10,7 @@ use std::cmp::min;
 use std::io::Read;
 use std::thread;
 use std::time::{Instant, Duration};
+use write::{OutputFileWriter, OutputChunkWriter};
 
 /// Constant to represent the length of the buffer to download
 /// the remote content
@@ -108,8 +108,9 @@ fn download_a_chunk(http_client: &Client,
 /// * the remote content length,
 /// * a mutable reference to share between threads, which contains each chunk,
 /// * the number of chunks that contains the remote content,
-/// * the URL of the remote content server.
-pub fn download_chunks(content_length: u64,
+/// * the URL of the remote content server,
+/// * a custom authorization to access and download the remote content.
+pub fn download_chunks(content_length: Bytes,
                        mut out_file: OutputFileWriter,
                        nb_chunks: u64,
                        url: &str,
@@ -144,7 +145,6 @@ pub fn download_chunks(content_length: u64,
         mp.show_time_left = true;
         mp.set_units(Units::Bytes);
         mp.message(&format!("Chunk {} ", chunk_index));
-
 
         let chunk_writer = out_file.get_chunk_writer(chunk_offset);
         jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
