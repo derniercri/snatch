@@ -8,7 +8,7 @@ extern crate num_cpus;
 use ansi_term::Colour::{Green, Yellow, Red, White};
 use clap::{App, Arg};
 use hyper::client::Client;
-use hyper::header::Headers;
+use hyper::header::{ByteRangeSpec, Headers, Range};
 use libsnatch::authorization::{AuthorizationHeaderFactory, AuthorizationType, GetAuthorizationType};
 use libsnatch::Bytes;
 use libsnatch::client::GetResponse;
@@ -151,11 +151,37 @@ fn main() {
     let remote_content_length = match client_response.headers.get_content_length() {
         Some(remote_content_length) => remote_content_length,
         None => {
+
             println!("{}",
-                     Red.bold()
-                         .paint("[ERROR] Cannot get the content length of the remote content, \
-                                 from the server."));
-            exit(1);
+                     Yellow.bold()
+                         .paint("[WARNING] Cannot get the remote content length, using an \
+                                 HEADER request."));
+            println!("{}",
+                     Yellow.bold()
+                         .paint("[WARNING] Trying to send an HTTP request, to get the remote \
+                                 content length..."));
+
+            // Trying to force the server to send to us the remote content length
+            let mut custom_HTTP_header = Headers::new();
+            // HTTP header to get all the remote content - if the response is OK, get the
+            // ContentLength information sent back from the server
+            custom_HTTP_header.set(Range::Bytes(vec![ByteRangeSpec::AllFrom(0)]));
+            // Get a response from the server, using the custom HTTP request
+            let client_response =
+                hyper_client.get_http_response_using_headers(&url, custom_HTTP_header).unwrap();
+            // Try again to get the content length - if this one is unknown again, stop the program
+            match client_response.headers.get_content_length() {
+                Some(remote_content_length) => {
+                    println!("{:?}", client_response);
+                    remote_content_length
+                }
+                None => {
+                    println!("{}",
+                             Red.bold()
+                                 .paint("[ERROR] Second attempt has failed."));
+                    exit(1);
+                }
+            }
         }
     };
 
