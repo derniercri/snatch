@@ -10,7 +10,6 @@ use clap::{App, Arg};
 use hyper::client::Client;
 use hyper::header::{ByteRangeSpec, Headers, Range};
 use libsnatch::authorization::{AuthorizationHeaderFactory, AuthorizationType, GetAuthorizationType};
-use libsnatch::Bytes;
 use libsnatch::client::GetResponse;
 use libsnatch::contentlength::GetContentLength;
 use libsnatch::download::download_chunks;
@@ -191,8 +190,13 @@ fn main() {
         }
     };
 
-    println!("# Remote content length: {:?} MB",
-             (remote_content_length / 1000000) as Bytes);
+    if remote_content_length > 1000000 {
+        println!("# Remote content length: {:.2} MB",
+                 (remote_content_length as f64 / 1000000.0));
+    } else {
+        println!("# Remote content length: {:.2} KB",
+                 (remote_content_length as f64 / 1000.0));
+    }
 
     let local_file = File::create(local_path).expect("[ERROR] Cannot create a file !");
 
