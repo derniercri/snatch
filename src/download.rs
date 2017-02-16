@@ -1,5 +1,5 @@
+use cargo_helper::CargoInfo;
 use Bytes;
-use write::{OutputFileWriter, OutputChunkWriter};
 use client::GetResponse;
 use hyper::client::Client;
 use hyper::error::Error;
@@ -10,6 +10,7 @@ use std::cmp::min;
 use std::io::Read;
 use std::thread;
 use std::time::{Instant, Duration};
+use write::{OutputFileWriter, OutputChunkWriter};
 
 /// Constant to represent the length of the buffer to download
 /// the remote content
@@ -46,22 +47,20 @@ fn get_chunk_length(chunk_index: u64,
 
 }
 
+
 /// Function to get the HTTP header to send to the file server, for a chunk (specified by its index)
 fn get_header_from_index(chunk_index: u64,
                          content_length: Bytes,
                          global_chunk_length: Bytes)
                          -> Option<(Headers, RangeBytes)> {
 
-    match get_chunk_length(chunk_index, content_length, global_chunk_length) {
-        Some(range) => {
-            let mut header = Headers::new();
-            header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(range.0, range.1)]));
-            Some((header, RangeBytes(range.0, range.1 - range.0)))
-        }
-        None => None,
-    }
-
+    get_chunk_length(chunk_index, content_length, global_chunk_length).map(|range| {
+        let mut header = Headers::new();
+        header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(range.0, range.1)]));
+        (header, RangeBytes(range.0, range.1 - range.0))
+    })
 }
+
 
 /// Function to get from the server the content of a chunk.
 /// This function returns a Result type - Bytes if the content of the header is accessible, an Error type otherwise.
@@ -109,14 +108,15 @@ fn download_a_chunk(http_client: &Client,
 /// * the remote content length,
 /// * a mutable reference to share between threads, which contains each chunk,
 /// * the number of chunks that contains the remote content,
-/// * the URL of the remote content server.
-pub fn download_chunks(content_length: u64,
+/// * the URL of the remote content server,
+/// * a custom authorization to access and download the remote content.
+pub fn download_chunks(cargo_info: CargoInfo,
                        mut out_file: OutputFileWriter,
                        nb_chunks: u64,
                        url: &str) {
+    let (content_length, auth_header_factory) =
+        (cargo_info.content_length, cargo_info.auth_header);
 
-    // let mut downloaded_chunks: Arc<Mutex<Chunks>> =
-    //     Arc::new(Mutex::new(Chunks::with_capacity(nb_chunks as usize)));
     let global_chunk_length: u64 = (content_length / nb_chunks) + 1;
     let mut jobs = vec![];
 
@@ -125,10 +125,13 @@ pub fn download_chunks(content_length: u64,
 
     for chunk_index in 0..nb_chunks {
 
-        let (http_header, RangeBytes(chunk_offset, chunk_length)) =
+        let (mut http_header, RangeBytes(chunk_offset, chunk_length)) =
             get_header_from_index(chunk_index, content_length, global_chunk_length).unwrap();
         let hyper_client = Client::new();
         let url_clone = String::from(url);
+        if let Some(auth_header_factory) = auth_header_factory.clone() {
+            http_header.set(auth_header_factory.build_header());
+        }
 
         // Progress bar customization
         let mut mp = mpb.create_bar(chunk_length);
@@ -141,7 +144,6 @@ pub fn download_chunks(content_length: u64,
         mp.show_time_left = true;
         mp.set_units(Units::Bytes);
         mp.message(&format!("Chunk {} ", chunk_index));
-
 
         let chunk_writer = out_file.get_chunk_writer(chunk_offset);
         jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
@@ -218,7 +220,7 @@ mod test_chunk_length {
 #[cfg(test)]
 mod test_header {
 
-    use super::get_header_from_index;
+    use super::{get_header_from_index, RangeBytes};
     use hyper::header::{ByteRangeSpec, Headers, Range};
 
     #[test]
@@ -230,7 +232,8 @@ mod test_header {
     fn good_chunk_length_should_return_a_good_header() {
         let mut test_header = Headers::new();
         test_header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(750, 997)]));
-        assert_eq!(Some((test_header, 247)), get_header_from_index(3, 998, 250));
+        assert_eq!(Some((test_header, RangeBytes(750, 247))),
+                   get_header_from_index(3, 998, 250));
     }
 
 }

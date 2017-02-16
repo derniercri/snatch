@@ -10,6 +10,13 @@ pub trait GetResponse {
     /// ressources and informations)
     fn get_head_response(&self, url: &str) -> Result<Response, Error>;
 
+    /// Given a specific URL and an header, get the header without the content body (useful to not
+    /// waste time, ressources and informations)
+    fn get_head_response_using_headers(&self,
+                                       url: &str,
+                                       header: Headers)
+                                       -> Result<Response, Error>;
+
     /// Given a specific URL, get the response from the target server
     fn get_http_response(&self, url: &str) -> Result<Response, Error>;
 
@@ -23,6 +30,13 @@ pub trait GetResponse {
 impl GetResponse for Client {
     fn get_head_response(&self, url: &str) -> Result<Response, Error> {
         self.request(Method::Head, url).send()
+    }
+
+    fn get_head_response_using_headers(&self,
+                                       url: &str,
+                                       custom_header: Headers)
+                                       -> Result<Response, Error> {
+        self.request(Method::Head, url).headers(custom_header).send()
     }
 
     fn get_http_response(&self, url: &str) -> Result<Response, Error> {

@@ -1,10 +1,10 @@
 extern crate hyper;
-extern crate snatch;
+extern crate libsnatch;
 
 #[cfg(test)]
 mod test_http_versions {
     use hyper::version::HttpVersion;
-    use snatch::http_version::ValidateHttpVersion;
+    use libsnatch::http_version::ValidateHttpVersion;
 
     #[test]
     fn version_09_failed() {
