@@ -1,4 +1,4 @@
-use authorization::AuthorizationHeaderFactory;
+use cargo_helper::CargoInfo;
 use Bytes;
 use client::GetResponse;
 use hyper::client::Client;
@@ -110,14 +110,13 @@ fn download_a_chunk(http_client: &Client,
 /// * the number of chunks that contains the remote content,
 /// * the URL of the remote content server,
 /// * a custom authorization to access and download the remote content.
-pub fn download_chunks(content_length: Bytes,
+pub fn download_chunks(cargo_info: CargoInfo,
                        mut out_file: OutputFileWriter,
                        nb_chunks: u64,
-                       url: &str,
-                       authorization_header_factory: Option<AuthorizationHeaderFactory>) {
+                       url: &str) {
+    let (content_length, auth_header_factory) =
+        (cargo_info.content_length, cargo_info.auth_header);
 
-    // let mut downloaded_chunks: Arc<Mutex<Chunks>> =
-    //     Arc::new(Mutex::new(Chunks::with_capacity(nb_chunks as usize)));
     let global_chunk_length: u64 = (content_length / nb_chunks) + 1;
     let mut jobs = vec![];
 
@@ -130,7 +129,7 @@ pub fn download_chunks(content_length: Bytes,
             get_header_from_index(chunk_index, content_length, global_chunk_length).unwrap();
         let hyper_client = Client::new();
         let url_clone = String::from(url);
-        if let Some(auth_header_factory) = authorization_header_factory.clone() {
+        if let Some(auth_header_factory) = auth_header_factory.clone() {
             http_header.set(auth_header_factory.build_header());
         }
 
