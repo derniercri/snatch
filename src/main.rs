@@ -190,13 +190,17 @@ fn main() {
         }
     };
 
-    if remote_content_length > 1000000 {
-        println!("# Remote content length: {:.2} MB",
-                 (remote_content_length as f64 / 1000000.0));
-    } else {
-        println!("# Remote content length: {:.2} KB",
-                 (remote_content_length as f64 / 1000.0));
-    }
+
+    let (file_size, unit) = match remote_content_length {
+       0 ... 999                            => (remote_content_length as f64, "Bytes"),
+       1_000 ... 999_999                    => (remote_content_length as f64 / 1_000.0, "KB"),
+       1_000_000 ... 999_999_999            => (remote_content_length as f64 / 1_000_000.0, "MB"),
+       1_000_000_000 ... 999_999_999_999    => (remote_content_length as f64 / 1_000_000_000.0, "GB"),
+       _                                    => (remote_content_length as f64 / 1_000_000_000_000.0, "TB")
+    };
+        println!("# Remote content length: {:.2} {}",
+                 file_size,
+                 unit);
 
     let local_file = File::create(local_path).expect("[ERROR] Cannot create a file !");
 
