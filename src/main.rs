@@ -193,10 +193,10 @@ fn main() {
 
     let (file_size, unit) = match remote_content_length {
        0 ... 999                            => (remote_content_length as f64, "Bytes"),
-       1_000 ... 999_999                    => (remote_content_length as f64 / 1_000.0, "KB"),
-       1_000_000 ... 999_999_999            => (remote_content_length as f64 / 1_000_000.0, "MB"),
-       1_000_000_000 ... 999_999_999_999    => (remote_content_length as f64 / 1_000_000_000.0, "GB"),
-       _                                    => (remote_content_length as f64 / 1_000_000_000_000.0, "TB")
+       1_000 ... 999_999                    => (remote_content_length as f64 / 1_024.0, "KB"),
+       1_000_000 ... 999_999_999            => (remote_content_length as f64 / 1_048_576.0, "MB"),
+       1_000_000_000 ... 999_999_999_999    => (remote_content_length as f64 / 1_073_741_824.0, "GB"),
+       _                                    => (remote_content_length as f64 / 1_099_511_627_776.0, "TB")
     };
         println!("# Remote content length: {:.2} {}",
                  file_size,
