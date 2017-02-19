@@ -24,6 +24,21 @@ const PROGRESS_UPDATE_INTERVAL_MILLIS: u64 = 500;
 #[derive(Debug, PartialEq)]
 struct RangeBytes(Bytes, Bytes);
 
+macro_rules! initbar {
+    ($mp:ident,$mpb:ident,$length:expr,$index:expr) => {
+        let mut $mp = $mpb.create_bar($length);
+        $mp.tick_format("▏▎▍▌▋▊▉██▉▊▋▌▍▎▏");
+        $mp.format("|#--|");
+        $mp.show_tick = true;
+        $mp.show_speed = true;
+        $mp.show_percent = true;
+        $mp.show_counter = false;
+        $mp.show_time_left = true;
+        $mp.set_units(Units::Bytes);
+        $mp.message(&format!("Chunk {} ", $index));
+    }
+}
+
 /// Function to get the current chunk length, based on the chunk index.
 fn get_chunk_length(chunk_index: u64,
                     content_length: Bytes,
@@ -134,17 +149,8 @@ pub fn download_chunks(content_length: Bytes,
             http_header.set(auth_header_factory.build_header());
         }
 
-        // Progress bar customization
-        let mut mp = mpb.create_bar(chunk_length);
-        mp.tick_format("▏▎▍▌▋▊▉██▉▊▋▌▍▎▏");
-        mp.format("|#--|");
-        mp.show_tick = true;
-        mp.show_speed = true;
-        mp.show_percent = true;
-        mp.show_counter = false;
-        mp.show_time_left = true;
-        mp.set_units(Units::Bytes);
-        mp.message(&format!("Chunk {} ", chunk_index));
+        // Initialize the progress bar for that chunk
+        initbar!(mp, mpb, chunk_length, chunk_index);
 
         let chunk_writer = out_file.get_chunk_writer(chunk_offset);
         jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
