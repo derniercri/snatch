@@ -17,7 +17,10 @@ A simple, fast and interruptable download accelerator, written in Rust
 ## Installation
 
 1. Install Rust and Cargo using [rustup](https://www.rustup.rs/) ;
-2. Install _Snatch_: `cargo install --git https://github.com/derniercri/snatch.git --branch devel` ;
+2. You can download two versions of _Snatch_ :  
+  * the latest build from [crates.io](https://crates.io/): `cargo install
+    snatch` ;
+  * the last commit version from Github: `cargo install --git https://github.com/derniercri/snatch.git --branch devel` ;
 3. Enjoy !
 
 ## Usage
