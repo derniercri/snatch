@@ -153,13 +153,13 @@ pub fn download_chunks(content_length: Bytes,
                                                                     &url_clone,
                                                                     &mut mp) {
             Ok(bytes_written) => {
-                if bytes_written > 0 {
-                    mp.finish();
-                } else {
+                mp.finish();
+                if bytes_written == 0 {
                     panic!("The downloaded chunk {} is empty", chunk_index);
                 }
             }
             Err(error) => {
+                mp.finish();
                 panic!("Cannot download the chunk {}, due to error {}",
                        chunk_index,
                        error);
