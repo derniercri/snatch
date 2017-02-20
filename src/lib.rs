@@ -1,5 +1,6 @@
 extern crate hyper;
 extern crate pbr;
+extern crate ansi_term;
 
 use std::sync::{Arc, Mutex};
 
@@ -10,6 +11,8 @@ pub mod download;
 pub mod http_version;
 pub mod response;
 pub mod write;
+pub mod cargo_helper;
+pub mod util;
 
 /// Represents a number of bytes, as `u64`.
 pub type Bytes = u64;
