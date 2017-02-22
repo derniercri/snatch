@@ -10,12 +10,12 @@ use clap::{App, Arg};
 use hyper::client::Client;
 use hyper::header::{ByteRangeSpec, Headers, Range};
 use libsnatch::authorization::{AuthorizationHeaderFactory, AuthorizationType, GetAuthorizationType};
-use libsnatch::Bytes;
 use libsnatch::client::GetResponse;
 use libsnatch::contentlength::GetContentLength;
 use libsnatch::download::download_chunks;
 use libsnatch::http_version::ValidateHttpVersion;
 use libsnatch::write::OutputFileWriter;
+use libsnatch::filesize::format_filesize;
 use std::fs::File;
 use std::io;
 use std::io::Write;
@@ -191,8 +191,16 @@ fn main() {
         }
     };
 
-    println!("# Remote content length: {:?} MB",
-             (remote_content_length / 1000000) as Bytes);
+
+//    let (file_size, unit) = match remote_content_length {
+//       0 ... 999                            => (remote_content_length as f64, "Bytes"),
+//       1_000 ... 999_999                    => (remote_content_length as f64 / 1_024.0, "KB"),
+//       1_000_000 ... 999_999_999            => (remote_content_length as f64 / 1_048_576.0, "MB"),
+//       1_000_000_000 ... 999_999_999_999    => (remote_content_length as f64 / 1_073_741_824.0, "GB"),
+//       _                                    => (remote_content_length as f64 / 1_099_511_627_776.0, "TB")
+//    };
+        println!("# Remote content length: {}",
+                 format_filesize(remote_content_length));
 
     let local_file = File::create(local_path).expect("[ERROR] Cannot create a file !");
 

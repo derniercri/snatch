@@ -10,6 +10,7 @@ pub mod download;
 pub mod http_version;
 pub mod response;
 pub mod write;
+pub mod filesize;
 
 /// Represents a number of bytes, as `u64`.
 pub type Bytes = u64;
