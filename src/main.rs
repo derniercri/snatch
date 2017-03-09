@@ -52,8 +52,11 @@ fn main() {
 
     let url = argparse.value_of("url").unwrap();
 
-    let file = argparse.value_of("file")
-        .unwrap_or_else(|| url.split('/').last().unwrap_or(DEFAULT_FILENAME));
+    let file = argparse.value_of("file").unwrap_or_else(|| {
+                                                            url.split('/')
+                                                                .last()
+                                                                .unwrap_or(DEFAULT_FILENAME)
+                                                        });
 
     let threads: usize = value_t!(argparse, "threads", usize).unwrap_or(num_cpus::get_physical());
 
@@ -85,14 +88,14 @@ fn main() {
             }
         } else {
             println!("{}",
-                     Yellow.bold()
-                         .paint("[WARNING] The path to store the file already exists! \
+                     Yellow.bold().paint("[WARNING] The path to store the file already exists! \
                                  It is going to be overriden."));
         }
     }
 
     let cargo_info = get_cargo_info(&url).expect("fail to parse url");
-    println!("# Remote content length: {}", format_filesize(cargo_info.content_length));
+    println!("# Remote content length: {}",
+             format_filesize(cargo_info.content_length));
 
     let local_file = File::create(local_path).expect("[ERROR] Cannot create a file !");
 
