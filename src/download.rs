@@ -129,8 +129,7 @@ pub fn download_chunks(cargo_info: CargoInfo,
                        mut out_file: OutputFileWriter,
                        nb_chunks: u64,
                        url: &str) {
-    let (content_length, auth_header_factory) =
-        (cargo_info.content_length, cargo_info.auth_header);
+    let (content_length, auth_header_factory) = (cargo_info.content_length, cargo_info.auth_header);
 
     let global_chunk_length: u64 = (content_length / nb_chunks) + 1;
     let mut jobs = vec![];
@@ -153,23 +152,23 @@ pub fn download_chunks(cargo_info: CargoInfo,
 
         let chunk_writer = out_file.get_chunk_writer(chunk_offset);
         jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
-                                                                    http_header,
-                                                                    chunk_writer,
-                                                                    &url_clone,
-                                                                    &mut mp) {
-            Ok(bytes_written) => {
-                mp.finish();
-                if bytes_written == 0 {
-                    panic!("The downloaded chunk {} is empty", chunk_index);
-                }
+                                                       http_header,
+                                                       chunk_writer,
+                                                       &url_clone,
+                                                       &mut mp) {
+                                    Ok(bytes_written) => {
+            mp.finish();
+            if bytes_written == 0 {
+                panic!("The downloaded chunk {} is empty", chunk_index);
             }
-            Err(error) => {
-                mp.finish();
-                panic!("Cannot download the chunk {}, due to error {}",
-                       chunk_index,
-                       error);
-            }
-        }));
+        }
+                                    Err(error) => {
+            mp.finish();
+            panic!("Cannot download the chunk {}, due to error {}",
+                   chunk_index,
+                   error);
+        }
+                                }));
     }
 
     mpb.listen();
