@@ -23,3 +23,12 @@ type Chunk = Vec<u8>;
 pub type Chunks = Vec<Chunk>;
 /// Represents a shared mutable reference of chunks
 pub type SChunks = Arc<Mutex<Chunks>>;
+
+/// Enumerate possible download mod
+/// MONOTHREADED: The download of the file = only one thread
+/// MULTITHREADED: The download of the file = X threads
+#[derive(Debug)]
+pub enum DownloadMod {
+    MONOTHREADED,
+    MULTITHREADED,
+}
