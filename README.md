@@ -73,6 +73,7 @@ If you want to create a pull request, this is the procedure to make it great:
 * fork the project,
 * create a local branch to make changes (from our `devel` branch),
 * test your changes (and make sure that existing tests, with `cargo test`, are ok),
+* create the documentation,
 * create a pull request (please compare it with our `devel` branch),
 * explain your changes,
 * submit !
