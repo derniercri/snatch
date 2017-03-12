@@ -72,7 +72,7 @@ If you want to create a pull request, this is the procedure to make it great:
 * create an issue to explain the problem you encountered (except for typo),
 * fork the project,
 * create a local branch to make changes (from our `devel` branch),
-* test your changes,
+* test your changes (and make sure that existing tests, with `cargo test`, are ok),
 * create a pull request (please compare it with our `devel` branch),
 * explain your changes,
 * submit !
