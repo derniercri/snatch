@@ -1,17 +1,17 @@
-use authorization::{AuthorizationHeaderFactory,AuthorizationType,GetAuthorizationType};
-use util::prompt_user;
-use client::GetResponse;
-use http_version::ValidateHttpVersion;
-use contentlength::GetContentLength;
-use Bytes;
 use ansi_term::Colour::{Green, Yellow, White};
-use hyper::header::{ByteRangeSpec, Headers, Range};
+use authorization::{AuthorizationHeaderFactory, AuthorizationType, GetAuthorizationType};
+use Bytes;
+use client::GetResponse;
+use contentlength::GetContentLength;
+use http_version::ValidateHttpVersion;
 use hyper::client::Client;
+use hyper::header::{ByteRangeSpec, Headers, Range};
 use std::result::Result;
+use util::prompt_user;
 
-pub struct CargoInfo{
+pub struct CargoInfo {
     pub content_length: Bytes,
-    pub auth_header: Option<AuthorizationHeaderFactory>
+    pub auth_header: Option<AuthorizationHeaderFactory>,
 }
 
 pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
@@ -51,7 +51,7 @@ pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
                                                  can create a new issue to report this problem \
                                                  in https://github.\
                                                  com/derniercri/snatch/issues/new",
-                                                 a_type));
+                                       a_type));
                 }
             }
         }
@@ -101,6 +101,11 @@ pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
         }
     };
 
-    Ok(CargoInfo { content_length: remote_content_length,
-                   auth_header:  auth_header_factory})
+    let support_partialcontent = match 
+
+    Ok(CargoInfo {
+           content_length: remote_content_length,
+           auth_header: auth_header_factory,
+       })
 }
+
