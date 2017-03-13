@@ -17,8 +17,7 @@ pub struct CargoInfo{
 pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
     let hyper_client = Client::new();
 
-    let client_response = hyper_client.get_head_response(url).unwrap();
-
+    let client_response = hyper_client.get_head_response(url).expect("fail to get header");
     print!("# Waiting a response from the remote server... ");
 
     if !client_response.version.greater_than_http_11() {
