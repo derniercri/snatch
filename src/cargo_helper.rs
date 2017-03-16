@@ -2,7 +2,7 @@ use ansi_term::Colour::{Green, Yellow, White};
 use authorization::{AuthorizationHeaderFactory, AuthorizationType, GetAuthorizationType};
 use Bytes;
 use client::GetResponse;
-use contentlength::GetContentLength;
+use headers::HeadersSupporting;
 use http_version::ValidateHttpVersion;
 use hyper::client::Client;
 use hyper::header::{ByteRangeSpec, Headers, Range};
@@ -67,7 +67,12 @@ pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
         None => client_response,
     };
 
-    let remote_content_length = match client_response.headers.get_content_length() {
+    println!("{:?}", client_response.headers);
+
+    println!("Supporting AcceptRanges: {:?}",
+             client_response.headers.support_acceptranges_header());
+
+    let remote_content_length = match client_response.headers.get_contentlength_header_content() {
         Some(remote_content_length) => remote_content_length,
         None => {
 
@@ -89,7 +94,7 @@ pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
             let client_response =
                 hyper_client.get_http_response_using_headers(&url, custom_http_header).unwrap();
             // Try again to get the content length - if this one is unknown again, stop the program
-            match client_response.headers.get_content_length() {
+            match client_response.headers.get_contentlength_header_content() {
                 Some(remote_content_length) => {
                     println!("{:?}", client_response);
                     remote_content_length
@@ -100,8 +105,6 @@ pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
             }
         }
     };
-
-    let support_partialcontent = match 
 
     Ok(CargoInfo {
            content_length: remote_content_length,
