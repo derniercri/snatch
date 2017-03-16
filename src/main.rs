@@ -8,6 +8,7 @@ extern crate num_cpus;
 use ansi_term::Colour::{Green, Yellow, Red};
 use clap::{App, Arg};
 use libsnatch::download::download_chunks;
+use libsnatch::DownloadMod;
 use libsnatch::write::OutputFileWriter;
 use libsnatch::util::prompt_user;
 use libsnatch::filesize::format_filesize;
@@ -26,22 +27,22 @@ fn main() {
         .about("Snatch, a simple, fast and interruptable download accelerator, written in Rust.")
         .version(crate_version!())
         .arg(Arg::with_name("file")
-            .long("file")
-            .short("f")
-            .takes_value(true)
-            .help("The local file to save the remote content file"))
+                 .long("file")
+                 .short("f")
+                 .takes_value(true)
+                 .help("The local file to save the remote content file"))
         .arg(Arg::with_name("threads")
-            .long("threads")
-            .short("t")
-            .takes_value(true)
-            .help("Threads which can use to download"))
+                 .long("threads")
+                 .short("t")
+                 .takes_value(true)
+                 .help("Threads which can use to download"))
         .arg(Arg::with_name("debug")
-            .long("debug")
-            .short("d")
-            .help("Active the debug mode"))
+                 .long("debug")
+                 .short("d")
+                 .help("Active the debug mode"))
         .arg(Arg::with_name("force")
-            .long("force")
-            .help("Assume Yes to all queries and do not prompt"))
+                 .long("force")
+                 .help("Assume Yes to all queries and do not prompt"))
         .arg(Arg::with_name("url")
             .index(1)
             //.multiple(true)
