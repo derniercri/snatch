@@ -50,3 +50,4 @@ impl GetResponse for Client {
         self.request(Method::Get, url).headers(custom_header).send()
     }
 }
+
