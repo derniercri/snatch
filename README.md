@@ -5,7 +5,7 @@ A simple, fast and interruptable download accelerator, written in Rust
 
 ![Snatch logo](./img/snatch-horizontal.png)
 
-(A special thanks to [@frankirito](https://github.com/frankirito) for this awesome logo !)
+(A special thanks to [@fh-d](https://github.com/fh-d) for this awesome logo !)
 
 ## Current features
 
