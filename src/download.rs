@@ -1,5 +1,11 @@
+use futures::{Future, IntoFuture};
+use futures_cpupool::CpuPool;
+use futures::future::FutureResult;
+
+
 use cargo_helper::CargoInfo;
 use Bytes;
+use filesize::format_filesize;
 use client::GetResponse;
 use hyper::client::Client;
 use hyper::error::Error;
@@ -8,7 +14,7 @@ use pbr::{MultiBar, Pipe, ProgressBar, Units};
 use response::CheckResponseStatus;
 use std::cmp::min;
 use std::io::Read;
-use std::thread;
+use std::sync::Arc;
 use std::time::{Instant, Duration};
 use write::{OutputFileWriter, OutputChunkWriter};
 
@@ -79,7 +85,8 @@ fn get_header_from_index(chunk_index: u64,
 
 /// Function to get from the server the content of a chunk.
 /// This function returns a Result type - Bytes if the content of the header is accessible, an Error type otherwise.
-fn download_a_chunk(http_client: &Client,
+
+fn download_a_chunk(http_client: Arc<Client>,
                     http_header: Headers,
                     mut chunk_writer: OutputChunkWriter,
                     url: &str,
@@ -136,12 +143,13 @@ pub fn download_chunks(cargo_info: CargoInfo,
 
     let mut mpb = MultiBar::new();
     mpb.println(&format!("Downloading {} chunks: ", nb_chunks));
+    let pool = CpuPool::new(nb_chunks as usize);
+    let hyper_client = Arc::new(Client::new());
 
     for chunk_index in 0..nb_chunks {
 
         let (mut http_header, RangeBytes(chunk_offset, chunk_length)) =
             get_header_from_index(chunk_index, content_length, global_chunk_length).unwrap();
-        let hyper_client = Client::new();
         let url_clone = String::from(url);
         if let Some(auth_header_factory) = auth_header_factory.clone() {
             http_header.set(auth_header_factory.build_header());
@@ -151,32 +159,26 @@ pub fn download_chunks(cargo_info: CargoInfo,
         initbar!(mp, mpb, chunk_length, chunk_index);
 
         let chunk_writer = out_file.get_chunk_writer(chunk_offset);
-        jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
-                                                       http_header,
-                                                       chunk_writer,
-                                                       &url_clone,
-                                                       &mut mp) {
-                                    Ok(bytes_written) => {
+        let client = hyper_client.clone();
+        jobs.push(pool.spawn_fn(move || {
+            let result = download_a_chunk(client, http_header, chunk_writer, &url_clone, &mut mp);
             mp.finish();
-            if bytes_written == 0 {
-                panic!("The downloaded chunk {} is empty", chunk_index);
-            }
-        }
-                                    Err(error) => {
-            mp.finish();
-            panic!("Cannot download the chunk {}, due to error {}",
-                   chunk_index,
-                   error);
-        }
-                                }));
+
+            let ret: FutureResult<Bytes, Error> = match result {
+                Err(error) => panic!("Cannot download the chunk {}, due to error {}", chunk_index, error),
+                Ok(sum) => Ok(sum).into_future(),
+            };
+            ret
+        }));
     }
 
     mpb.listen();
 
-    for child in jobs {
-        let _ = child.join();
-    }
-
+    let download_bytes  = jobs.into_iter()
+                              .map(|x| {x.wait().unwrap()})
+                              .fold(0u64, |sum, x| sum + x);
+    println!("Download content length: {}", format_filesize(download_bytes));
+    assert_eq!(content_length, download_bytes);
 }
 
 #[cfg(test)]

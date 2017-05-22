@@ -1,6 +1,8 @@
 extern crate hyper;
 extern crate pbr;
 extern crate ansi_term;
+extern crate futures;
+extern crate futures_cpupool;
 
 use std::sync::{Arc, Mutex};
 
