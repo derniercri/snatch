@@ -7,11 +7,11 @@ extern crate num_cpus;
 
 use ansi_term::Colour::{Green, Yellow, Red};
 use clap::{App, Arg};
-use libsnatch::download::download_chunks;
-use libsnatch::write::OutputFileWriter;
-use libsnatch::util::prompt_user;
-use libsnatch::filesize::format_filesize;
 use libsnatch::cargo_helper::get_cargo_info;
+use libsnatch::download::download_chunks;
+use libsnatch::filesize::format_filesize;
+use libsnatch::util::prompt_user;
+use libsnatch::write::OutputFileWriter;
 use std::fs::{File, remove_file};
 use std::path::Path;
 use std::process::exit;
@@ -56,7 +56,8 @@ fn main() {
         .value_of("file")
         .unwrap_or_else(|| url.split('/').last().unwrap_or(DEFAULT_FILENAME));
 
-    let threads: usize = value_t!(argparse, "threads", usize)
+    // Check if multi-threaded download is possible
+    let mut threads: usize = value_t!(argparse, "threads", usize)
         .and_then(|v| if v != 0 {
                       Ok(v)
                   } else {
@@ -110,6 +111,17 @@ fn main() {
         .set_len(cargo_info.content_length)
         .expect("[ERROR] Cannot extend file to download size!");
     let out_file = OutputFileWriter::new(local_file);
+
+    // If the server does not accept PartialContent status, download the remote file
+    // using only one thread
+    if !cargo_info.accept_partialcontent {
+        println!("{}",
+                 Yellow
+                     .bold()
+                     .paint("[WARNING] The remote server does not accept PartialContent status! \
+                             Downloading the remote file using one thread."));
+        threads = 1;
+    }
 
     if download_chunks(cargo_info, out_file, threads as u64, &url) {
         println!("{} Your download is available in {}",
