@@ -188,14 +188,8 @@ pub fn download_chunks(cargo_info: CargoInfo,
 
     for child in jobs {
         match child.join() {
-            Ok(b) => {
-                println!("{}", b);
-                child_results.push(b);
-            }
-            Err(error) => {
-                println!("{:?}", error);
-                child_results.push(false);
-            }
+            Ok(b) => child_results.push(b),
+            Err(_) => child_results.push(false),
         }
     }
 
