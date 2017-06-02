@@ -26,22 +26,22 @@ fn main() {
         .about("Snatch, a simple, fast and interruptable download accelerator, written in Rust.")
         .version(crate_version!())
         .arg(Arg::with_name("file")
-            .long("file")
-            .short("f")
-            .takes_value(true)
-            .help("The local file to save the remote content file"))
+                 .long("file")
+                 .short("f")
+                 .takes_value(true)
+                 .help("The local file to save the remote content file"))
         .arg(Arg::with_name("threads")
-            .long("threads")
-            .short("t")
-            .takes_value(true)
-            .help("Threads which can use to download"))
+                 .long("threads")
+                 .short("t")
+                 .takes_value(true)
+                 .help("Threads which can use to download"))
         .arg(Arg::with_name("debug")
-            .long("debug")
-            .short("d")
-            .help("Active the debug mode"))
+                 .long("debug")
+                 .short("d")
+                 .help("Active the debug mode"))
         .arg(Arg::with_name("force")
-            .long("force")
-            .help("Assume Yes to all queries and do not prompt"))
+                 .long("force")
+                 .help("Assume Yes to all queries and do not prompt"))
         .arg(Arg::with_name("url")
             .index(1)
             //.multiple(true)
@@ -52,11 +52,9 @@ fn main() {
 
     let url = argparse.value_of("url").unwrap();
 
-    let file = argparse.value_of("file").unwrap_or_else(|| {
-                                                            url.split('/')
-                                                                .last()
-                                                                .unwrap_or(DEFAULT_FILENAME)
-                                                        });
+    let file = argparse
+        .value_of("file")
+        .unwrap_or_else(|| url.split('/').last().unwrap_or(DEFAULT_FILENAME));
 
     let threads: usize = value_t!(argparse, "threads", usize).unwrap_or(num_cpus::get_physical());
 
@@ -88,7 +86,9 @@ fn main() {
             }
         } else {
             println!("{}",
-                     Yellow.bold().paint("[WARNING] The path to store the file already exists! \
+                     Yellow
+                         .bold()
+                         .paint("[WARNING] The path to store the file already exists! \
                                  It is going to be overriden."));
         }
     }
@@ -99,21 +99,22 @@ fn main() {
 
     let local_file = File::create(local_path).expect("[ERROR] Cannot create a file !");
 
-    local_file.set_len(cargo_info.content_length)
+    local_file
+        .set_len(cargo_info.content_length)
         .expect("[ERROR] Cannot extend file to download size!");
     let out_file = OutputFileWriter::new(local_file);
 
     if download_chunks(cargo_info, out_file, threads as u64, &url) {
         println!("{} Your download is available in {}",
-                Green.bold().paint("Done!"),
-                local_path.to_str().unwrap());
+                 Green.bold().paint("Done!"),
+                 local_path.to_str().unwrap());
     } else {
         // If the file is not ok, delete it from the file system
         print!("{} An error occured - erasing file... ",
-                Red.bold().paint("Failed!"));
+               Red.bold().paint("Failed!"));
         match remove_file(local_path) {
             Ok(_) => println!("done !"),
-            Err(e) => println!("failed ({}) !", e)
+            Err(e) => println!("failed ({}) !", e),
         }
     }
 
