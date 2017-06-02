@@ -5,7 +5,9 @@ use std::io::Write;
 
 pub fn prompt_user(style: Style, prompt: &str) -> String {
     print!("{} ", style.paint(prompt));
-    io::stdout().flush().expect("[ERROR] Couldn't flush stdout!");
+    io::stdout()
+        .flush()
+        .expect("[ERROR] Couldn't flush stdout!");
 
     let mut user_input = String::new();
     io::stdin()
