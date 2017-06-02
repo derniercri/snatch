@@ -86,6 +86,7 @@ Thank you for your interest in contributing to _Snatch_ ! :-D
     *   Delete automatically the file if the download is not OK
     *   Fix the behaviour when downloading a file using zero thread (yes, that was possible...)
     *   Fix the behaviour when downloading a file using one thread
+    *   Monothreading download if the remote server does not support PartialContent headers
 
 *   0.1.2 (`2ee85c151167770ce0a71245e72c02497625087f`)
     No changelogs reported
