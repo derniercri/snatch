@@ -91,7 +91,6 @@ pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
             // Try again to get the content length - if this one is unknown again, stop the program
             match client_response.headers.get_content_length() {
                 Some(remote_content_length) => {
-                    println!("{:?}", client_response);
                     remote_content_length
                 }
                 None => {
