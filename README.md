@@ -81,20 +81,20 @@ Thank you for your interest in contributing to _Snatch_ ! :-D
 
 ## Changelogs
 
-*   0.1.3
+*   0.1.3 (**current**)
     *   Fix the behaviour to know if the download is OK or not
     *   Delete automatically the file if the download is not OK
     *   Fix the behaviour when downloading a file using zero thread (yes, that was possible...)
     *   Fix the behaviour when downloading a file using one thread
     *   Monothreading download if the remote server does not support PartialContent headers
 
-*   0.1.2 (`2ee85c151167770ce0a71245e72c02497625087f`)
+*   0.1.2 (`2ee85c151167770ce0a71245e72c02497625087f`)  
     No changelogs reported
     
-*   0.1.1 (`624a59d23e28d369bae2f9d30ea22db197f7e729`)
+*   0.1.1 (`624a59d23e28d369bae2f9d30ea22db197f7e729`)  
     No changelogs reported
 
-*   0.1.0
+*   0.1.0  
     No changelogs reported
 
 ## Build issues
