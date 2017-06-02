@@ -12,7 +12,7 @@ use libsnatch::write::OutputFileWriter;
 use libsnatch::util::prompt_user;
 use libsnatch::filesize::format_filesize;
 use libsnatch::cargo_helper::get_cargo_info;
-use std::fs::File;
+use std::fs::{File, remove_file};
 use std::path::Path;
 use std::process::exit;
 
@@ -103,9 +103,18 @@ fn main() {
         .expect("[ERROR] Cannot extend file to download size!");
     let out_file = OutputFileWriter::new(local_file);
 
-    download_chunks(cargo_info, out_file, threads as u64, &url);
+    if download_chunks(cargo_info, out_file, threads as u64, &url) {
+        println!("{} Your download is available in {}",
+                Green.bold().paint("Done!"),
+                local_path.to_str().unwrap());
+    } else {
+        // If the file is not ok, delete it from the file system
+        print!("{} An error occured - erasing file... ",
+                Red.bold().paint("Failed!"));
+        match remove_file(local_path) {
+            Ok(_) => println!("done !"),
+            Err(e) => println!("failed ({}) !", e)
+        }
+    }
 
-    println!("{} Your download is available in {}",
-             Green.bold().paint("Done!"),
-             local_path.to_str().unwrap());
 }
