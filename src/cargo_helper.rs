@@ -19,13 +19,7 @@ pub struct CargoInfo {
 pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
     let hyper_client = Client::new();
 
-    // Ask the first byte, just to know if the server accept PartialContent status
-    let mut header = Headers::new();
-    header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(0, 1)]));
-
-    let client_response = hyper_client
-        .get_head_response_using_headers(url, header)
-        .unwrap();
+    let client_response = hyper_client.get_head_response(url).unwrap();
 
     print!("# Waiting a response from the remote server... ");
 
@@ -37,7 +31,6 @@ pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
     }
 
     let auth_type = client_response.headers.get_authorization_type();
-    let partialcontent_status = client_response.check_partialcontent_status();
     let auth_header_factory = match auth_type {
         Some(a_type) => {
             match a_type {
@@ -112,8 +105,18 @@ pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
         }
     };
 
+    // Ask the first byte, just to know if the server accept PartialContent status
+    let mut header = Headers::new();
+    header.set(Range::Bytes(vec![ByteRangeSpec::FromTo(0, 1)]));
+
+    let client_response = hyper_client
+        .get_head_response_using_headers(url, header)
+        .unwrap();
+
+    print!("# Checking the server's support for PartialContent headers...");
+
     Ok(CargoInfo {
-           accept_partialcontent: partialcontent_status,
+           accept_partialcontent: client_response.check_partialcontent_status(),
            auth_header: auth_header_factory,
            content_length: remote_content_length,
        })
