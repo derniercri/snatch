@@ -128,7 +128,8 @@ fn download_a_chunk(http_client: &Client,
 pub fn download_chunks(cargo_info: CargoInfo,
                        mut out_file: OutputFileWriter,
                        nb_chunks: u64,
-                       url: &str) {
+                       url: &str)
+                       -> bool {
     let (content_length, auth_header_factory) = (cargo_info.content_length, cargo_info.auth_header);
 
     let global_chunk_length: u64 = (content_length / nb_chunks) + 1;
@@ -151,32 +152,40 @@ pub fn download_chunks(cargo_info: CargoInfo,
         initbar!(mp, mpb, chunk_length, chunk_index);
 
         let chunk_writer = out_file.get_chunk_writer(chunk_offset);
-        jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
-                                                       http_header,
-                                                       chunk_writer,
-                                                       &url_clone,
-                                                       &mut mp) {
-                                    Ok(bytes_written) => {
-            mp.finish();
-            if bytes_written == 0 {
-                panic!("The downloaded chunk {} is empty", chunk_index);
+        
+        // In this work, we push a boolean value to know if the chunk is OK
+        jobs.push(thread::spawn(move ||
+            match download_a_chunk(&hyper_client, http_header, chunk_writer, &url_clone, &mut mp) {
+                Ok(bytes_written) => {
+                    mp.finish();
+                    if bytes_written == 0 {
+                        println!("The downloaded chunk {} is empty", chunk_index);
+                    }
+                    return true;
+                }
+                Err(error) => {
+                    mp.finish();
+                    println!("Cannot download the chunk {}, due to error {}", chunk_index, error);
+                    return false;
+                }
             }
-        }
-                                    Err(error) => {
-            mp.finish();
-            panic!("Cannot download the chunk {}, due to error {}",
-                   chunk_index,
-                   error);
-        }
-                                }));
+        ));
     }
 
     mpb.listen();
 
+    // Contain the result state for chunks
+    let mut child_results : Vec<bool> = Vec::with_capacity(nb_chunks as usize);
+    
     for child in jobs {
-        let _ = child.join();
+        match child.join() {
+            Ok(b) => child_results.push(b),
+            Err(_) => child_results.push(false),
+        }
     }
 
+    // Check if all chunks are ok
+    return child_results.iter().all(|x| *x)
 }
 
 #[cfg(test)]
