@@ -83,13 +83,14 @@ fn download_a_chunk(http_client: &Client,
                     http_header: Headers,
                     mut chunk_writer: OutputChunkWriter,
                     url: &str,
-                    mpb: &mut ProgressBar<Pipe>)
+                    mpb: &mut ProgressBar<Pipe>,
+                    monothreading: bool)
                     -> Result<Bytes, Error> {
 
     let mut body = http_client
         .get_http_response_using_headers(url, http_header)
         .unwrap();
-    if !body.check_partialcontent_status() {
+    if monothreading && !body.check_partialcontent_status() {
         return Err(Error::Status);
     }
     let mut bytes_buffer = [0; DOWNLOAD_BUFFER_BYTES];
@@ -149,6 +150,7 @@ pub fn download_chunks(cargo_info: CargoInfo,
         if let Some(auth_header_factory) = auth_header_factory.clone() {
             http_header.set(auth_header_factory.build_header());
         }
+        let monothreading = cargo_info.accept_partialcontent;
 
         // Initialize the progress bar for that chunk
         initbar!(mp, mpb, chunk_length, chunk_index);
@@ -160,7 +162,8 @@ pub fn download_chunks(cargo_info: CargoInfo,
                                                                http_header,
                                                                chunk_writer,
                                                                &url_clone,
-                                                               &mut mp) {
+                                                               &mut mp,
+                                                               monothreading) {
                                     Ok(bytes_written) => {
             mp.finish();
             if bytes_written == 0 {
@@ -185,8 +188,14 @@ pub fn download_chunks(cargo_info: CargoInfo,
 
     for child in jobs {
         match child.join() {
-            Ok(b) => child_results.push(b),
-            Err(_) => child_results.push(false),
+            Ok(b) => {
+                println!("{}", b);
+                child_results.push(b);
+            }
+            Err(error) => {
+                println!("{:?}", error);
+                child_results.push(false);
+            }
         }
     }
 
