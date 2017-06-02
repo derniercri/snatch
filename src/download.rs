@@ -190,7 +190,7 @@ pub fn download_chunks(cargo_info: CargoInfo,
         }
     }
 
-    // Check if all chunks are ok
+    // Check if all chunks are OK
     return child_results.iter().all(|x| *x);
 }
 
