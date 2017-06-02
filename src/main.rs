@@ -56,7 +56,14 @@ fn main() {
         .value_of("file")
         .unwrap_or_else(|| url.split('/').last().unwrap_or(DEFAULT_FILENAME));
 
-    let threads: usize = value_t!(argparse, "threads", usize).unwrap_or(num_cpus::get_physical());
+    let threads: usize = value_t!(argparse, "threads", usize)
+        .and_then(|v| if v != 0 {
+                      Ok(v)
+                  } else {
+                      Err(clap::Error::with_description("Cannot download a file using 0 thread",
+                                                        clap::ErrorKind::InvalidValue))
+                  })
+        .unwrap_or(num_cpus::get_physical());
 
     if argparse.is_present("debug") {
         println!("# [{}] version: {}",
