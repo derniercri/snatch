@@ -1,6 +1,6 @@
 [package]
 name = "snatch"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Antonin Carette <antonin@derniercri.io>", "Jean-Serge Monbailly <jean-serge@derniercri.io>"]
 description = "A simple and fast download accelerator"
 repository = "https://github.com/derniercri/snatch"

@@ -83,11 +83,14 @@ fn download_a_chunk(http_client: &Client,
                     http_header: Headers,
                     mut chunk_writer: OutputChunkWriter,
                     url: &str,
-                    mpb: &mut ProgressBar<Pipe>)
+                    mpb: &mut ProgressBar<Pipe>,
+                    monothreading: bool)
                     -> Result<Bytes, Error> {
 
-    let mut body = http_client.get_http_response_using_headers(url, http_header).unwrap();
-    if !body.check_partialcontent_status() {
+    let mut body = http_client
+        .get_http_response_using_headers(url, http_header)
+        .unwrap();
+    if monothreading && !body.check_partialcontent_status() {
         return Err(Error::Status);
     }
     let mut bytes_buffer = [0; DOWNLOAD_BUFFER_BYTES];
@@ -128,7 +131,8 @@ fn download_a_chunk(http_client: &Client,
 pub fn download_chunks(cargo_info: CargoInfo,
                        mut out_file: OutputFileWriter,
                        nb_chunks: u64,
-                       url: &str) {
+                       url: &str)
+                       -> bool {
     let (content_length, auth_header_factory) = (cargo_info.content_length, cargo_info.auth_header);
 
     let global_chunk_length: u64 = (content_length / nb_chunks) + 1;
@@ -146,37 +150,51 @@ pub fn download_chunks(cargo_info: CargoInfo,
         if let Some(auth_header_factory) = auth_header_factory.clone() {
             http_header.set(auth_header_factory.build_header());
         }
+        let monothreading = cargo_info.accept_partialcontent;
 
         // Initialize the progress bar for that chunk
         initbar!(mp, mpb, chunk_length, chunk_index);
 
         let chunk_writer = out_file.get_chunk_writer(chunk_offset);
+
+        // In this work, we push a boolean value to know if the chunk is OK
         jobs.push(thread::spawn(move || match download_a_chunk(&hyper_client,
-                                                       http_header,
-                                                       chunk_writer,
-                                                       &url_clone,
-                                                       &mut mp) {
+                                                               http_header,
+                                                               chunk_writer,
+                                                               &url_clone,
+                                                               &mut mp,
+                                                               monothreading) {
                                     Ok(bytes_written) => {
             mp.finish();
             if bytes_written == 0 {
-                panic!("The downloaded chunk {} is empty", chunk_index);
+                println!("The downloaded chunk {} is empty", chunk_index);
             }
+            return true;
         }
                                     Err(error) => {
             mp.finish();
-            panic!("Cannot download the chunk {}, due to error {}",
-                   chunk_index,
-                   error);
+            println!("Cannot download the chunk {}, due to error {}",
+                     chunk_index,
+                     error);
+            return false;
         }
                                 }));
     }
 
     mpb.listen();
 
+    // Contain the result state for chunks
+    let mut child_results: Vec<bool> = Vec::with_capacity(nb_chunks as usize);
+
     for child in jobs {
-        let _ = child.join();
+        match child.join() {
+            Ok(b) => child_results.push(b),
+            Err(_) => child_results.push(false),
+        }
     }
 
+    // Check if all chunks are OK
+    return child_results.iter().all(|x| *x);
 }
 
 #[cfg(test)]
