@@ -2,6 +2,7 @@ extern crate ansi_term;
 #[macro_use]
 extern crate clap;
 extern crate hyper;
+extern crate hyper_native_tls;
 extern crate libsnatch;
 extern crate num_cpus;
 
