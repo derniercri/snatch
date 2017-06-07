@@ -6,6 +6,8 @@ use contentlength::GetContentLength;
 use http_version::ValidateHttpVersion;
 use hyper::header::{ByteRangeSpec, Headers, Range};
 use hyper::client::Client;
+use hyper::net::HttpsConnector;
+use hyper_native_tls::NativeTlsClient;
 use response::CheckResponseStatus;
 use std::result::Result;
 use util::prompt_user;
@@ -17,7 +19,7 @@ pub struct CargoInfo {
 }
 
 pub fn get_cargo_info(url: &str) -> Result<CargoInfo, String> {
-    let hyper_client = Client::new();
+    let hyper_client = Client::with_connector(HttpsConnector::new(NativeTlsClient::new().unwrap()));
 
     let client_response = hyper_client.get_head_response(url).unwrap();
 
