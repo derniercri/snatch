@@ -75,8 +75,8 @@ impl AuthorizationHeaderFactory {
         match self.authorization_type {
             AuthorizationType::Basic => Authorization(format!("Basic {}", self)),
             _ => {
-                panic!("{} Authorization is not supported!",
-                       self.authorization_type)
+                epanic!(&format!("{} Authorization is not supported!",
+                                 self.authorization_type))
             }
         }
     }

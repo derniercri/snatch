@@ -167,15 +167,15 @@ pub fn download_chunks(cargo_info: CargoInfo,
                                     Ok(bytes_written) => {
             mp.finish();
             if bytes_written == 0 {
-                println!("The downloaded chunk {} is empty", chunk_index);
+                error!(&format!("The downloaded chunk {} is empty", chunk_index));
             }
             return true;
         }
                                     Err(error) => {
             mp.finish();
-            println!("Cannot download the chunk {}, due to error {}",
-                     chunk_index,
-                     error);
+            error!(&format!("Cannot download the chunk {}, due to error {}",
+                            chunk_index,
+                            error));
             return false;
         }
                                 }));

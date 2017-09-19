@@ -3,6 +3,11 @@
 # snatch
 A simple, fast and interruptable download accelerator, written in Rust
 
+## WARNING
+
+**This project is no longer maintained by @k0pernicus and @jean-serge.**  
+**Instead of Snatch, you can use, report features or issues and/or contribute to [Zou](https://github.com/k0pernicus/zou).**
+
 ![Snatch logo](./img/snatch-horizontal.png)
 
 (A special thanks to [@fh-d](https://github.com/fh-d) for this awesome logo !)
